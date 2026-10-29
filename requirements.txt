@@ -1,0 +1,8 @@
+Flask==3.0.3
+waitress==3.0.0
+mysql-connector-python==8.4.0
+python-dotenv==1.0.1
+pypdf==6.19.0
+requests==2.34.2
+pytz==2023.3.post1
+tzdata==2026.4

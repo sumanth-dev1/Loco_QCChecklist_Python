@@ -1,0 +1,25 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables & secrets (CRITICAL: DO NOT COMMIT REAL PASSWORDS)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+app_errors.log
+
+# Scratch & temporary test scripts
+scratch/
+
+# User uploads & media (folder preserved via .gitkeep)
+uploads/*
+!uploads/.gitkeep
