@@ -278,7 +278,7 @@ async function showSection(section) {
       <option value="WDG-3" ${locoInfo && locoInfo.locoType === "WDG-3" ? "selected" : ""}>WDG-3</option>
       <option value="WDG-3A" ${locoInfo && locoInfo.locoType === "WDG-3A" ? "selected" : ""}>WDG-3A</option>
       <option value="EMU" ${locoInfo && locoInfo.locoType === "EMU" ? "selected" : ""}>EMU</option>
-      <option value="EMU" ${locoInfo && locoInfo.locoType === "MEMU" ? "selected" : ""}>MEMU</option>
+      <option value="MEMU" ${locoInfo && locoInfo.locoType === "MEMU" ? "selected" : ""}>MEMU</option>
       <option value="Vande Bharat" ${locoInfo && locoInfo.locoType === "Vande Bharat" ? "selected" : ""}>Vande Bharat</option>
       <option value="Amrit Bharat" ${locoInfo && locoInfo.locoType === "Amrit Bharat" ? "selected" : ""}>Amrit Bharat</option>
       <option value="WDM" ${locoInfo && locoInfo.locoType === "WDM" ? "selected" : ""}>WDM</option>
@@ -287,6 +287,9 @@ async function showSection(section) {
       <option value="WDP-4D" ${locoInfo && locoInfo.locoType === "WDP-4D" ? "selected" : ""}>WDP-4D</option>
       <option value="WDP-4" ${locoInfo && locoInfo.locoType === "WDP-4" ? "selected" : ""}>WDP-4</option>
       <option value="WDS-6RD" ${locoInfo && locoInfo.locoType === "WDS-6RD" ? "selected" : ""}>WDS-6RD</option>
+       <option value="EF-9K" ${locoInfo && locoInfo.locoType === "EF-9K" ? "selected" : ""}>EF-9K</option>
+       <option value="EF-12K" ${locoInfo && locoInfo.locoType === "EF-12K" ? "selected" : ""}>EF-12K</option>
+       <option value="D-9" ${locoInfo && locoInfo.locoType === "D-9" ? "selected" : ""}>D-9</option>
                 </select>
                 </div>
               </td>
@@ -356,6 +359,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>SWR</option>
+                  <option value="SR"  ${locoInfo && locoInfo.railwayDivision === "SR"
+      ? "selected"
+      : ""
+    }>SR</option>
                 </select>
             </td>
             
@@ -373,6 +380,11 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Kalyan(KYNE)</option>
+               <option value="SANPADA" data-division="CR" ${locoInfo && locoInfo.shedName === "SANPADA"
+      ? "selected"
+      : ""
+    }>SANPADA</option>
+                
 
                 <!-- For ER Division -->
                <!-- For ER Division -->
@@ -383,9 +395,17 @@ async function showSection(section) {
 <option value="Barddhaman(BWNX)" data-division="ER" ${locoInfo && locoInfo.shedName === "Barddhaman(BWNX)" ? "selected" : ""}>Barddhaman(BWNX)</option>
 <option value="CLW-Dankuni" data-division="ER" ${locoInfo && locoInfo.shedName === "CLW-Dankuni" ? "selected" : ""}>CLW-Dankuni</option>
 <option value="SSE/DLS-Andal(UDL)" data-division="ER" ${locoInfo && locoInfo.shedName === "SSE/DLS-Andal(UDL)" ? "selected" : ""}>SSE/DLS-Andal(UDL)</option>
+<option value="Chittaranjan-CLW" data-division="ER" ${locoInfo && locoInfo.shedName === "Chittaranjan-CLW" ? "selected" : ""}>Chittaranjan-CLW</option>
+<option value="Ranaghat" data-division="ER" ${locoInfo && locoInfo.shedName === "Ranaghat" ? "selected" : ""}>Ranaghat</option>
+<option value="Narkeldanga EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Narkeldanga EMU" ? "selected" : ""}>Narkeldanga EMU</option>
+<option value="Howrah EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Howrah EMU" ? "selected" : ""}>Howrah EMU</option>
+<option value="Bandel EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Bandel EMU" ? "selected" : ""}>Bandel EMU</option>
+<option value="Barasat EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Barasat EMU" ? "selected" : ""}>Barasat EMU</option>
+<option value="Sonarpur EMU Shed Carsed" data-division="ER" ${locoInfo && locoInfo.shedName === "Sonarpur EMU Shed Carsed" ? "selected" : ""}>Sonarpur EMU Shed Carsed</option>
                <!-- For WR Division -->
               <option value="Vadodara Loco Shed(BRC)" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Vadodara Loco Shed(BRC)" || locoInfo.shedName.toLowerCase().includes("vadodara") || locoInfo.shedName.toLowerCase().includes("vadodhara")) ? "selected" : ""}>Vadodara Loco Shed(BRC)</option>
               <option value="Vatva Loco Shed(VTA)" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Vatva Loco Shed(VTA)" || locoInfo.shedName.toLowerCase().includes("vatva")) ? "selected" : ""}>Vatva Loco Shed(VTA)</option>
+              <option value="Dahod" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Dahod" || locoInfo.shedName.toLowerCase().includes("dahod")) ? "selected" : ""}>Dahod</option>
                 
               <!-- For NFR Division -->
                 <option value="Malda(MLDD)" data-division="NFR" ${locoInfo && locoInfo.shedName === "Malda(MLDD)"
@@ -398,6 +418,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Tatanagar(TATE)</option>
+                 <option value="Bondamunda (BNDM)" data-division="SER" ${locoInfo && locoInfo.shedName === "Bondamunda (BNDM)"
+      ? "selected"
+      : ""
+    }>Bondamunda (BNDM)</option>
 
                 <!-- For ECR Division -->
                 <option value="Deen Dayal Upadhyay(DDUE)" data-division="ECR" ${locoInfo && locoInfo.shedName === "Deen Dayal Upadhyay(DDUE)"
@@ -416,6 +440,14 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Patratu(PTRX)</option>
+                <option value="Vishakapatnam" data-division="ECR" ${locoInfo && locoInfo.shedName === "Vishakapatnam"
+      ? "selected"
+      : ""
+    }>Vishakapatnam</option>
+                <option value="GAYA" data-division="ECR" ${locoInfo && locoInfo.shedName === "GAYA"
+      ? "selected"
+      : ""
+    }>GAYA</option>
 
                 <!-- For NR Division -->
                 <option value="Ludhiana(LDHE)" data-division="NR" ${locoInfo && locoInfo.shedName === "Ludhiana(LDHE)"
@@ -442,6 +474,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Kapurthala(RCF)</option>
+                <option value="MCF_NR_Raebarelly" data-division="NR" ${locoInfo && locoInfo.shedName === "MCF_NR_Raebarelly"
+      ? "selected"
+      : ""
+    }>MCF_NR_Raebarelly</option>
 
 
                 <!-- For NCR Division -->
@@ -453,12 +489,30 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Jhansi(JHSD)</option>
+                  <option value="Kanpur" data-division="NCR" ${locoInfo && locoInfo.shedName === "Kanpur"
+      ? "selected"
+      : ""
+    }>Kanpur</option>
 
                   <!-- For SWR Division -->
                 <option value="KR Puram Loco Shed" data-division="SWR" ${locoInfo && locoInfo.shedName === "KR Puram Loco Shed"
       ? "selected"
       : ""
     }>KR Puram Loco Shed</option>
+                 <option value="Hubli" data-division="SWR" ${locoInfo && locoInfo.shedName === "Hubli"
+      ? "selected"
+      : ""
+    }>Hubli</option>
+             
+                  <!-- For SR Division -->
+                <option value="Arakkonam" data-division="SR" ${locoInfo && locoInfo.shedName === "Arakkonam"
+      ? "selected"
+      : ""
+    }>Arakkonam</option>
+                <option value="Tiruchirappalli" data-division="SR" ${locoInfo && locoInfo.shedName === "Tiruchirappalli"
+      ? "selected"
+      : ""
+    }>Tiruchirappalli</option>
                  
 
                 <!-- For WCR Division -->
@@ -470,6 +524,14 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Tuglakabad(TKDE)</option>
+                <option value="New Katni Junction - Diesel" data-division="WCR" ${locoInfo && locoInfo.shedName === "New Katni Junction - Diesel"
+      ? "selected"
+      : ""
+    }>New Katni Junction - Diesel</option>
+                <option value="New Katni Junction - Electric" data-division="WCR" ${locoInfo && locoInfo.shedName === "New Katni Junction - Electric "
+      ? "selected"
+      : ""
+    }>New Katni Junction - Electric</option>
               </select>
             </td>
                         
