@@ -8389,8 +8389,12 @@ function updateObservationsTable(sectionID, observations, sno) {
     `;
 
     // For the observation text cell, include the barcode input field only for section "2_0"
-    let observationContent = defaultTexts[S_no] || decodeHtmlEntities(observation.observation_text) || "N/A";
-    observationContent = decodeHtmlEntities(observationContent);
+    let baseText = decodeHtmlEntities(observation.observation_text) || defaultTexts[S_no] || "N/A";
+    baseText = decodeHtmlEntities(baseText);
+    if (sectionID === "2_0") {
+      baseText = baseText.replace(/<input[^>]*>/gi, '').replace(/<br\s*[\/]?>/gi, '').trim();
+    }
+    let observationContent = baseText;
     let heightValue = "";
     if (sectionID === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       let statusText = observation.observation_status || "";
