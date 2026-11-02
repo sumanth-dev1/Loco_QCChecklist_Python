@@ -57,7 +57,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NOW())
                 image_path = html.escape(obs['image_path']) if obs.get('image_path') else None
                 cursor.execute(sql, (
                     locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,
-                    html.escape(str(obs.get('observation_text', ''))),
+                    str(obs.get('observation_text', '')),
                     html.escape(str(obs.get('remarks', ''))),
                     html.escape(str(obs.get('S_no', ''))),
                     image_path,

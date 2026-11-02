@@ -163,6 +163,10 @@ def generateReport():
             tbl_obs = cursor.fetchall()
 
             for obs in tbl_obs:
+                if obs.get('observation_text'):
+                    obs['observation_text'] = html.unescape(obs['observation_text'])
+                    if '&lt;' in obs['observation_text']:
+                        obs['observation_text'] = html.unescape(obs['observation_text'])
                 imgs_for_sno = all_images.get(obs['S_no'], [])
                 valid_images = []
                 for img_path in imgs_for_sno:

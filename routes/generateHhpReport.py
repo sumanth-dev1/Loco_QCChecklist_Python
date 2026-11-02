@@ -85,9 +85,15 @@ def generateHhpReport():
                     else:
                         valid_web_images.append(clean_p)
 
+                obs_text = row['observation_text']
+                if obs_text:
+                    obs_text = html.unescape(obs_text)
+                    if '&lt;' in obs_text:
+                        obs_text = html.unescape(obs_text)
+
                 all_observations.append({
                     'S_no': row['S_no'],
-                    'observation_text': row['observation_text'],
+                    'observation_text': obs_text,
                     'observation_status': row['observation_status'],
                     'remarks': row['remarks'],
                     'image_path': ','.join(img_paths) if img_paths else (row['image_path'] or ''),

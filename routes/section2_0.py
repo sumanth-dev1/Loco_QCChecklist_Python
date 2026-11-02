@@ -61,7 +61,7 @@ def section2_0():
                 barcode = obs.get('barcode_kavach_main_unit')
                 cursor.execute(sql, (
                     loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date,
-                    html.escape(str(obs.get('observation_text', ''))),
+                    str(obs.get('observation_text', '')),
                     html.escape(str(obs.get('remarks', ''))),
                     barcode,
                     html.escape(str(obs.get('S_no', ''))),

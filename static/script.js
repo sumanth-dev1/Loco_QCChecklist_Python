@@ -343,6 +343,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>SR</option>
+                  <option value="SCOR"  ${locoInfo && locoInfo.railwayDivision === "SCOR"
+      ? "selected"
+      : ""
+    }>SCOR</option>
                 </select>
             </td>
             
@@ -374,7 +378,7 @@ async function showSection(section) {
 <option value="jamalpur(JMPD)" data-division="ER" ${locoInfo && locoInfo.shedName === "jamalpur(JMPD)" ? "selected" : ""}>jamalpur(JMPD)</option>
 <option value="Barddhaman(BWNX)" data-division="ER" ${locoInfo && locoInfo.shedName === "Barddhaman(BWNX)" ? "selected" : ""}>Barddhaman(BWNX)</option>
 <option value="CLW-Dankuni" data-division="ER" ${locoInfo && locoInfo.shedName === "CLW-Dankuni" ? "selected" : ""}>CLW-Dankuni</option>
-<option value="SSE/DLS-Andal(UDL)" data-division="ER" ${locoInfo && locoInfo.shedName === "SSE/DLS-Andal(UDL)" ? "selected" : ""}>SSE/DLS-Andal(UDL)</option>
+<option value="Andal" data-division="ER" ${locoInfo && locoInfo.shedName === "Andal" ? "selected" : ""}>Andal</option>
 <option value="Chittaranjan-CLW" data-division="ER" ${locoInfo && locoInfo.shedName === "Chittaranjan-CLW" ? "selected" : ""}>Chittaranjan-CLW</option>
 <option value="Ranaghat" data-division="ER" ${locoInfo && locoInfo.shedName === "Ranaghat" ? "selected" : ""}>Ranaghat</option>
 <option value="Narkeldanga EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Narkeldanga EMU" ? "selected" : ""}>Narkeldanga EMU</option>
@@ -392,6 +396,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Malda(MLDD)</option>
+                <option value="Siliguri" data-division="NFR" ${locoInfo && locoInfo.shedName === "Siliguri"
+      ? "selected"
+      : ""
+    }>Siliguri</option>
 
                 <!-- For SER Division -->
                 <option value="Tatanagar(TATE)" data-division="SER" ${locoInfo && locoInfo.shedName === "Tatanagar(TATE)"
@@ -420,10 +428,6 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Patratu(PTRX)</option>
-                <option value="Vishakapatnam" data-division="ECR" ${locoInfo && locoInfo.shedName === "Vishakapatnam"
-      ? "selected"
-      : ""
-    }>Vishakapatnam</option>
                 <option value="GAYA" data-division="ECR" ${locoInfo && locoInfo.shedName === "GAYA"
       ? "selected"
       : ""
@@ -446,10 +450,14 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Patiala(PLW)</option>
-                <option value="Tuglakabad(TKD-D)" data-division="NR" ${locoInfo && locoInfo.shedName === "Tuglakabad(TKD-D)"
+                <option value="Tuglakabad(TKD-D)" data-division="NR" ${locoInfo && (locoInfo.shedName === "Tuglakabad(TKD-D)" || locoInfo.shedName === "Tughlakabad")
       ? "selected"
       : ""
     }>Tuglakabad(TKD-D)</option>
+                <option value="Tughlakabad" data-division="NR" ${locoInfo && (locoInfo.shedName === "Tughlakabad" || locoInfo.shedName === "Tuglakabad(TKD-D)")
+      ? "selected"
+      : ""
+    }>Tughlakabad</option>
                 <option value="Kapurthala(RCF)" data-division="NR" ${locoInfo && locoInfo.shedName === "Kapurthala(RCF)"
       ? "selected"
       : ""
@@ -475,10 +483,10 @@ async function showSection(section) {
     }>Kanpur</option>
 
                   <!-- For SWR Division -->
-                <option value="KR Puram Loco Shed" data-division="SWR" ${locoInfo && locoInfo.shedName === "KR Puram Loco Shed"
+                <option value="Krishnarajapuram" data-division="SWR" ${locoInfo && locoInfo.shedName === "Krishnarajapuram"
       ? "selected"
       : ""
-    }>KR Puram Loco Shed</option>
+    }>Krishnarajapuram</option>
                  <option value="Hubli" data-division="SWR" ${locoInfo && locoInfo.shedName === "Hubli"
       ? "selected"
       : ""
@@ -493,7 +501,12 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Tiruchirappalli</option>
-                 
+
+                <!-- For SCOR Division -->
+                <option value="Visakhapatnam" data-division="SCOR" ${locoInfo && locoInfo.shedName === "Visakhapatnam"
+      ? "selected"
+      : ""
+    }>Visakhapatnam</option>
 
                 <!-- For WCR Division -->
                 <option value="Itarsi(ETE)" data-division="WCR" ${locoInfo && locoInfo.shedName === "Itarsi(ETE)"
@@ -8270,6 +8283,19 @@ function updateEditedBarcode(rowId, value) {
   window.editedBarcodes[rowId] = value;
 }
 
+
+function decodeHtmlEntities(str) {
+  if (!str) return "";
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  let val = txt.value;
+  if (val.includes("&lt;") || val.includes("&gt;")) {
+    txt.innerHTML = val;
+    val = txt.value;
+  }
+  return val;
+}
+
 function updateObservationsTable(sectionID, observations, sno) {
   const tbody = document.getElementById(`observations-tbody-${sectionID}`);
   if (!tbody) {
@@ -8278,13 +8304,22 @@ function updateObservationsTable(sectionID, observations, sno) {
   }
 
   const defaultTexts = {};
+  const defaultOptionsMap = {};
   Array.from(tbody.querySelectorAll("tr")).forEach(tr => {
     const s_no_td = tr.querySelector("td:first-child");
     const text_td = tr.querySelector(".observation_text");
-    if (s_no_td && text_td) {
-      defaultTexts[s_no_td.innerText.trim()] = text_td.innerHTML;
+    const select = tr.querySelector("select");
+    if (s_no_td) {
+      const snoVal = s_no_td.innerText.trim();
+      if (text_td) defaultTexts[snoVal] = text_td.innerHTML;
+      if (select) {
+        defaultOptionsMap[snoVal] = Array.from(select.options)
+          .map(o => o.value)
+          .filter(v => v && v !== "Select");
+      }
     }
   });
+  window.currentDefaultOptionsMap = defaultOptionsMap;
 
   tbody.innerHTML = "";
 
@@ -8354,7 +8389,8 @@ function updateObservationsTable(sectionID, observations, sno) {
     `;
 
     // For the observation text cell, include the barcode input field only for section "2_0"
-    let observationContent = observation.observation_text || defaultTexts[S_no] || "N/A";
+    let observationContent = defaultTexts[S_no] || decodeHtmlEntities(observation.observation_text) || "N/A";
+    observationContent = decodeHtmlEntities(observationContent);
     let heightValue = "";
     if (sectionID === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       let statusText = observation.observation_status || "";
@@ -8972,6 +9008,13 @@ function getDropdownOptions(sno, observationStatus) {
         return defaultOption + "\n" + matchedOptions;
       }
     }
+  }
+
+  if (window.currentDefaultOptionsMap && window.currentDefaultOptionsMap[sno] && window.currentDefaultOptionsMap[sno].length > 0) {
+    const fallbackOptions = window.currentDefaultOptionsMap[sno].map(value =>
+      `<option value="${value}" ${observationStatus?.trim() === value ? "selected" : ""}>${value}</option>`
+    ).join("\n");
+    return defaultOption + "\n" + fallbackOptions;
   }
 
   return defaultOption;
