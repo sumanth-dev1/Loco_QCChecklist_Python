@@ -69,6 +69,11 @@
       background-color: #f8f9fa;
     }
 
+    #summary-table th:first-child,
+    #summary-table td:first-child {
+      text-align: center;
+    }
+
     .btn-container {
       margin-top: 20px;
     }
@@ -211,6 +216,7 @@
       `;
       const tbody = table.querySelector("tbody");
       const grouped = {};
+      const closedSet = new Set();
 
       observations.forEach(obs => {
         const section = obs.S_no && typeof obs.S_no === 'string' && obs.S_no.includes('.') ? obs.S_no.split('.')[0] : null;
@@ -289,6 +295,7 @@
           switch (baseStatusText) {
             case 'Available':
             case 'Present':
+            case 'Ok':
             case 'Yes':
             case 'Routing Done':
             case 'Fixed':
@@ -305,13 +312,21 @@
             case 'Coating done':
             case 'Locked':
             case 'Applied':
+            case 'Cables Connected':
             case 'Cable Ties Implemented':
             case 'Metal clamps implemented':
             case 'Not Applicable':
+            case 'Applicable':
             case 'Verified and ok':
             case 'No but accepted':
+            case 'No But Accepted':
             case 'Accepted with Deviation':
+            case 'Accepted with deviation':
+            case 'Completed':
               statusClass = 'status-green';
+              if (obs.S_no) {
+                closedSet.add(String(obs.S_no).trim());
+              }
               break;
             case 'Not Available':
             case 'Not Present':
@@ -372,6 +387,33 @@
         });
       });
 
+      const totalPoints = 179;
+      const closedPoints = closedSet.size;
+      const openPoints = totalPoints - closedPoints;
+
+      const summaryTable = document.createElement("table");
+      summaryTable.id = "summary-table";
+      summaryTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>Total Points</th>
+            <th>Closed Points</th>
+            <th>Open Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>${totalPoints}</td>
+            <td>${closedPoints}</td>
+            <td>${openPoints}</td>
+          </tr>
+        </tbody>
+      `;
+
+      const observationsContainer = document.getElementById("observations-container");
+      observationsContainer.appendChild(table);
+      observationsContainer.appendChild(summaryTable);
+
       return table;
     }
 
@@ -382,8 +424,7 @@
       
       if (result.status === 'success' && result.data.length > 0) {
         container.innerHTML = "";
-        const table = createObservationsTable(result.data);
-        container.appendChild(table);
+        createObservationsTable(result.data);
       } else {
         container.innerHTML = `<p>${result.message || 'No observations recorded yet.'}</p>`;
       }
