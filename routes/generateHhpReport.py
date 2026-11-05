@@ -53,9 +53,21 @@ def generateHhpReport():
         host = request.host
         protocol = "https://" if request.is_secure else "http://"
 
+        try:
+            cursor.execute("ALTER TABLE `verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+        except Exception:
+            pass
+
+        try:
+            cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+        except Exception:
+            has_atr_col = False
+        atr_col_expr = ", atr_serial" if has_atr_col else ", NULL as atr_serial"
+
         all_observations = []
         for tbl in TABLE_NAMES:
-            barcode_select = ", barcode" if tbl == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode"
+            barcode_select = f", barcode {atr_col_expr}" if tbl == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode, NULL as atr_serial"
             sql = f"""SELECT S_no, observation_text, observation_status, remarks, image_path, created_at, updated_at, section_id {barcode_select} 
                       FROM `{tbl}` WHERE loco_id = %s
                       ORDER BY
@@ -94,6 +106,7 @@ def generateHhpReport():
                     'image_paths': img_paths,
                     'images': valid_web_images,
                     'barcode': row.get('barcode'),
+                    'atr_serial': row.get('atr_serial'),
                     'created_at': str(row['created_at']) if row.get('created_at') else None,
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None,
                     'section_id': row.get('section_id')

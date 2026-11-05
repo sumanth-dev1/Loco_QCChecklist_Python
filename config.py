@@ -15,6 +15,7 @@ DB_USER = os.environ.get("DB_USER", "root")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
 DB_NAME = os.environ.get("DB_NAME", "loco_info")
 HHP_DB_NAME = os.environ.get("HHP_DB_NAME", "hhp_loco_info")
+CONFIG_API_BASE_URL = os.environ.get("CONFIG_API_BASE_URL", "http://localhost:6015/api/configuration")
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY or SECRET_KEY == "dev-only-change-me":

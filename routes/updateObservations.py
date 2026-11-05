@@ -144,10 +144,24 @@ def updateObservations():
                         observation_text = updated_description.strip()
 
                 if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
-                    update_sql = f"""UPDATE {table_name}
-                        SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, observation_status = %s, remarks = %s, updated_at = NOW()
-                        WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
-                    cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, s_no))
+                    try:
+                        cursor.execute("ALTER TABLE verify_serial_numbers_of_equipment_as_per_ic ADD COLUMN atr_serial VARCHAR(255) NULL")
+                    except Exception:
+                        pass
+                    cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
+                    has_atr_col = bool(cursor.fetchone())
+                    new_atr = (item.get('atr_serial') or '').strip()
+
+                    if has_atr_col and new_atr:
+                        update_sql = f"""UPDATE {table_name}
+                            SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, atr_serial = %s, observation_status = %s, remarks = %s, updated_at = NOW()
+                            WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
+                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, new_atr, status, remarks, loco_id, section_id, s_no))
+                    else:
+                        update_sql = f"""UPDATE {table_name}
+                            SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, observation_status = %s, remarks = %s, updated_at = NOW()
+                            WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
+                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, s_no))
                 else:
                     update_sql = f"""UPDATE {table_name}
                         SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, observation_status = %s, remarks = %s, updated_at = NOW()

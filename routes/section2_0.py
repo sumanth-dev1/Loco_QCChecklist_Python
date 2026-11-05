@@ -51,24 +51,54 @@ def section2_0():
                 created_at = datetime.datetime.now(zoneinfo.ZoneInfo("Asia/Kolkata")).strftime('%Y-%m-%d %H:%M:%S')
 
             cursor.execute("DELETE FROM verify_serial_numbers_of_equipment_as_per_ic WHERE loco_id = %s AND (section_id = %s OR section_id = %s)", (loco_id, section_id, str(section_id).replace('.0', '')))
-            sql = """INSERT INTO verify_serial_numbers_of_equipment_as_per_ic (
-                loco_id, loco_type, brake_type, railway_division, shed_name,
-                inspection_date, observation_text, remarks, barcode, S_no,
-                observation_status, section_id, created_at, updated_at
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"""
+            
+            try:
+                cursor.execute("ALTER TABLE verify_serial_numbers_of_equipment_as_per_ic ADD COLUMN atr_serial VARCHAR(255) NULL")
+            except Exception:
+                pass
+
+            cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+
+            if has_atr_col:
+                sql = """INSERT INTO verify_serial_numbers_of_equipment_as_per_ic (
+                    loco_id, loco_type, brake_type, railway_division, shed_name,
+                    inspection_date, observation_text, remarks, barcode, atr_serial, S_no,
+                    observation_status, section_id, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"""
+            else:
+                sql = """INSERT INTO verify_serial_numbers_of_equipment_as_per_ic (
+                    loco_id, loco_type, brake_type, railway_division, shed_name,
+                    inspection_date, observation_text, remarks, barcode, S_no,
+                    observation_status, section_id, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"""
 
             for obs in observations:
                 barcode = obs.get('barcode_kavach_main_unit')
-                cursor.execute(sql, (
-                    loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date,
-                    html.escape(str(obs.get('observation_text', ''))),
-                    html.escape(str(obs.get('remarks', ''))),
-                    barcode,
-                    html.escape(str(obs.get('S_no', ''))),
-                    html.escape(str(obs.get('observation_status', ''))),
-                    section_id,
-                    created_at
-                ))
+                atr_serial = obs.get('atr_serial')
+                if has_atr_col:
+                    cursor.execute(sql, (
+                        loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date,
+                        html.escape(str(obs.get('observation_text', ''))),
+                        html.escape(str(obs.get('remarks', ''))),
+                        barcode,
+                        atr_serial,
+                        html.escape(str(obs.get('S_no', ''))),
+                        html.escape(str(obs.get('observation_status', ''))),
+                        section_id,
+                        created_at
+                    ))
+                else:
+                    cursor.execute(sql, (
+                        loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date,
+                        html.escape(str(obs.get('observation_text', ''))),
+                        html.escape(str(obs.get('remarks', ''))),
+                        barcode,
+                        html.escape(str(obs.get('S_no', ''))),
+                        html.escape(str(obs.get('observation_status', ''))),
+                        section_id,
+                        created_at
+                    ))
 
                 formatted_observations.append(format_observations(obs.get('observation_text', ''), obs.get('S_no', '')))
 

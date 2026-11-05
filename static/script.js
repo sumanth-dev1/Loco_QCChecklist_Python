@@ -665,6 +665,7 @@ async function showSection(section) {
           <tr>
             <th>S_No</th>
             <th>Description</th>
+            <th>ATR</th>
             <th>Observation</th>
             <th>Remarks/Comments</th>
             <th>Image</th>
@@ -674,6 +675,7 @@ async function showSection(section) {
         <tr id="row-4">
         <td>2.1</td>
       <td class="observation_text">Ensure presence of Hologram and S/R Stamp on each equipment</td>
+      <td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>
       <td>
         <select id="status-dropdown" onchange="highlightSelect(this)">
            <option value="Select">Select</option>
@@ -724,6 +726,24 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "/>
   </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
   
 
   
@@ -732,6 +752,7 @@ async function showSection(section) {
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -777,11 +798,30 @@ async function showSection(section) {
       "
     >
   </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
    <td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -830,11 +870,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-  <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)" style="width: 180px; padding: 5px; font-size: 14px; margin-bottom: 10px;">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -878,13 +937,31 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-  
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)" style="width: 180px; padding: 5px; font-size: 14px; margin-bottom: 10px;">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -930,12 +1007,31 @@ async function showSection(section) {
   "
 />
   </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
   
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)" style="width: 180px; padding: 5px; font-size: 14px; margin-bottom: 10px;">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -980,11 +1076,30 @@ async function showSection(section) {
   "
 />
   </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1030,11 +1145,30 @@ async function showSection(section) {
   "
 />
   </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1079,13 +1213,31 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-  
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1131,13 +1283,31 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-           
-          </td>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
             <td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1180,8 +1350,26 @@ async function showSection(section) {
     }
     toggleNotInstalledOption(this);
   "
-/> 
-          </td>
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
 
         
             <td class="select">
@@ -1189,6 +1377,7 @@ async function showSection(section) {
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1232,13 +1421,31 @@ async function showSection(section) {
     }
     toggleNotInstalledOption(this);
   "
-/>  
-
-            <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1285,13 +1492,32 @@ async function showSection(section) {
   "
 />
   </div>
-</td>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
 
             <td class="select">
              <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1336,11 +1562,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1384,11 +1629,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1433,11 +1697,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1481,11 +1764,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1530,11 +1832,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1579,11 +1900,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1628,11 +1968,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1677,11 +2036,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1725,11 +2103,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1773,11 +2170,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1821,11 +2237,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1869,11 +2304,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1917,11 +2371,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1965,11 +2438,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2014,11 +2506,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2063,11 +2574,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2112,11 +2642,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2161,11 +2710,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2210,11 +2778,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2260,11 +2847,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2309,11 +2915,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2358,11 +2983,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2407,11 +3051,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2457,11 +3120,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2507,11 +3189,30 @@ async function showSection(section) {
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -2557,11 +3258,31 @@ async function showSection(section) {
     }
     toggleNotInstalledOption(this);
   "
-/> <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -2606,11 +3327,31 @@ async function showSection(section) {
     }
     toggleNotInstalledOption(this);
   "
-/> <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+      <button 
+        type="button" 
+        class="fetch-atr-btn" 
+        onclick="fetchAtrSerial(this)" 
+        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+      >Fetch</button>
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -7715,7 +8456,11 @@ function highlightSelect(selectElement) {
   selectElement.style.color = ""; // default
 
   const value = selectElement.value;
-  if (
+  if (value === "Manual") {
+    selectElement.style.backgroundColor = "#ffc107";
+    selectElement.style.color = "#000";
+    return;
+  } else if (
     value === "Not Available" ||
     value === "No" ||
     value === "Not Connected" ||
@@ -8083,6 +8828,17 @@ async function saveObservation(section) {
       image_paths: imagePaths
     };
 
+    if (section === "2_0") {
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit']");
+      if (bcInput) {
+        observationPayload.barcode_kavach_main_unit = bcInput.value.trim().slice(-15);
+      }
+      const atrInput = row.querySelector(".atr-serial-input");
+      if (atrInput) {
+        observationPayload.atr_serial = atrInput.value.trim();
+      }
+    }
+
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       observationPayload.height = heightValue;
     }
@@ -8426,9 +9182,40 @@ oninput="
       `;
     }
 
+    let atrCellContent = "";
+    if (sectionID === "2_0") {
+      if (S_no === "2.1") {
+        atrCellContent = `<td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>`;
+      } else {
+        atrCellContent = `
+          <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input 
+                type="text" 
+                class="atr-serial-input" 
+                id="atr-input-${rowId}"
+                placeholder="ATR Serial No" 
+                style="width: 140px; padding: 5px; font-size: 14px;" 
+                value="${observation.atr_serial || ''}"
+                oninput="if(typeof enableUpdateButton==='function') enableUpdateButton(); if(typeof markDataAsUnsaved==='function') markDataAsUnsaved();"
+              />
+              <button 
+                type="button" 
+                class="fetch-atr-btn" 
+                onclick="fetchAtrSerial(this)" 
+                style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+              >Fetch</button>
+            </div>
+            <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+          </td>
+        `;
+      }
+    }
+
     row.innerHTML = `
       <td>${S_no}</td>
       <td class="observation_text">${observationContent}</td>
+      ${atrCellContent}
       <td>
         ${statusCellContent}
       </td>
@@ -8838,6 +9625,10 @@ async function updateObservation(section) {
 
     if (section === "2_0") {
       rowPayload.barcode = barcodeValue;
+      const atrInput = row.querySelector(".atr-serial-input");
+      if (atrInput) {
+        rowPayload.atr_serial = atrInput.value.trim();
+      }
     }
 
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
@@ -8915,7 +9706,7 @@ function getDropdownOptions(sno, observationStatus) {
   }
   const specificOptions = {
     "2.1": ["Present", "Not Present"],
-    "2.38,2.39,2.40,2.3": ["Matching", "Not Matching", "Not Installed", "Not Applicable"], "2.2,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14,2.15,2.16,2.17,2.18,2.19,2.20,2.21,2.22,2.23,2.24,2.25,2.26,2.27,2.28,2.29,2.30,2.31,2.32,2.33,2.34,2.35,2.36,2.37": ["Matching", "Not Matching", "Not Installed"],
+    "2.38,2.39,2.40,2.3": ["Matching", "Not Matching", "Manual", "Not Installed", "Not Applicable"], "2.2,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14,2.15,2.16,2.17,2.18,2.19,2.20,2.21,2.22,2.23,2.24,2.25,2.26,2.27,2.28,2.29,2.30,2.31,2.32,2.33,2.34,2.35,2.36,2.37": ["Matching", "Not Matching", "Manual", "Not Installed"],
     "3.6,14.13": ["Matching", "Not Matching"],
     "8.1,8.2,8.3,8.4,8.5,8.6": ["Yes", "No", "Accepted with Deviation", "No but accepted"],
     "3.3,3.4,3.5,3.5.1,3.5.2,3.12,3.13,6.2,6.4,6.7,7.2,9.1-9.6,14.2,14.6,15.2,15.4,15.10,15.5,15.5.1,3.12,3.13,5.7,6.10,6.11,5.1,14.8,5.2,5.3,9.7,5.8,5.7,15.9,8.7,8.8,8.9,8.10,8.13.1,8.13.2,8.13.3,8.13.4": ["Yes", "No"],
@@ -9592,6 +10383,9 @@ function highlightSelect(selectElement) {
     selectElement.style.backgroundColor = "red";
   } else if (selectElement.value === "No but accepted" || selectElement.value === "No But Accepted" || selectElement.value === "Accepted with Deviation") {
     selectElement.style.backgroundColor = "orange";
+  } else if (selectElement.value === "Manual") {
+    selectElement.style.backgroundColor = "#ffc107";
+    selectElement.style.color = "#000";
   } else {
     selectElement.style.backgroundColor = "";
   }
@@ -9748,4 +10542,119 @@ window.addEventListener('online', checkForUpdates);
 // Also check immediately when the page loads if already online
 if (navigator.onLine) {
   checkForUpdates();
+}
+
+
+// Function to fetch ATR details line by line from Configuration API
+async function fetchAtrSerial(btn) {
+  const tr = btn.closest("tr");
+  if (!tr) return;
+
+  const bcInput = tr.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+  const atrInput = tr.querySelector(".atr-serial-input");
+  const statusDiv = tr.querySelector(".atr-status-msg");
+  const selectEl = tr.querySelector("select");
+  const remarksEl = tr.querySelector(".remarks textarea");
+
+  const scannedValue = (bcInput ? bcInput.value : "").trim();
+  const atrValue = (atrInput ? atrInput.value : "").trim();
+  const partNoToQuery = scannedValue || atrValue;
+
+  if (!partNoToQuery) {
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: 600;">⚠️ Scan barcode or enter serial first</span>';
+    }
+    if (bcInput) bcInput.focus();
+    return;
+  }
+
+  const originalBtnText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "⏳...";
+  if (statusDiv) {
+    statusDiv.innerHTML = '<span style="color: #007bff;">Fetching ATR data...</span>';
+  }
+
+  try {
+    const response = await fetch(`/api/part-details?partNo=${encodeURIComponent(partNoToQuery)}`, {
+      cache: "no-store"
+    });
+    const result = await response.json();
+
+    if (response.ok && result && (result.status === true || (result.data && result.data.matched === true))) {
+      const data = result.data || {};
+      const fetchedSerial = (data.partNo ? String(data.partNo).trim() : partNoToQuery);
+      const partName = data.name || data.description || "";
+
+      if (atrInput) {
+        atrInput.value = fetchedSerial;
+        atrInput.style.backgroundColor = "#e8f8f5";
+        atrInput.style.borderColor = "#2ecc71";
+      }
+
+      // Check match:
+      // If scannedValue is present: check if it matches fetchedSerial (or API confirmed match)
+      // If no scannedValue was entered but atrValue was entered: it's matched
+      const isMatch = scannedValue 
+        ? (scannedValue.toLowerCase() === fetchedSerial.toLowerCase() || data.matched === true)
+        : (data.matched === true);
+
+      if (isMatch) {
+        if (selectEl) {
+          selectEl.value = "Matching";
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        if (statusDiv) {
+          statusDiv.innerHTML = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${partName ? '(' + partName + ')' : ''}</span>`;
+        }
+      } else {
+        if (selectEl) {
+          if ([...selectEl.options].some(o => o.value === "Manual")) {
+            selectEl.value = "Manual";
+          } else {
+            selectEl.value = "Not Matching";
+          }
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        if (statusDiv) {
+          statusDiv.innerHTML = '<span style="color: #e67e22; font-weight: bold;">✖ Mismatch &rarr; Set to Manual</span>';
+        }
+      }
+    } else {
+      // Part number not found / not matching
+      if (selectEl) {
+        if ([...selectEl.options].some(o => o.value === "Manual")) {
+          selectEl.value = "Manual";
+        } else {
+          selectEl.value = "Not Matching";
+        }
+        if (typeof highlightSelect === "function") highlightSelect(selectEl);
+      }
+      const errorMsg = (result && result.message) ? result.message : "Not Found";
+      if (statusDiv) {
+        statusDiv.innerHTML = `<span style="color: #e67e22; font-weight: bold;">✖ ${errorMsg} &rarr; Set to Manual</span>`;
+      }
+      if (remarksEl && !remarksEl.value.trim()) {
+        remarksEl.placeholder = "Manual verification remarks...";
+      }
+    }
+  } catch (err) {
+    console.error("Fetch ATR error:", err);
+    if (selectEl) {
+      if ([...selectEl.options].some(o => o.value === "Manual")) {
+        selectEl.value = "Manual";
+      } else {
+        selectEl.value = "Not Matching";
+      }
+      if (typeof highlightSelect === "function") highlightSelect(selectEl);
+    }
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: bold;">⚠️ Error connecting to server &rarr; Manual</span>';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalBtnText;
+    if (typeof enableUpdateButton === "function") enableUpdateButton();
+    if (typeof markDataAsUnsaved === "function") markDataAsUnsaved();
+  }
 }

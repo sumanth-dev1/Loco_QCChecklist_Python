@@ -74,6 +74,7 @@ from routes.db_migration import db_migration_bp
 from routes.upload_to_wfms import upload_to_wfms_bp
 from routes.wfms_proxy import wfms_proxy_bp
 from routes.db_admin import db_admin_bp
+from routes.part_details import part_details_bp
 
 # HHP Specific Blueprints
 from routes.connect_hhp import connect_hhp_bp
@@ -118,7 +119,7 @@ blueprints = [
     edit_report_bp, fetchReports_bp, generateReport_bp, getLocoDetails_bp, getNextVersion_bp,
     getReportById_bp, getReportDetails_bp, save_image_bp, save_report_bp, update_version_bp,
     upload_bp, uploadReport_bp, uploadSignature_bp, viewReports_bp, db_migration_bp,
-    upload_to_wfms_bp, wfms_proxy_bp, db_admin_bp,
+    upload_to_wfms_bp, wfms_proxy_bp, db_admin_bp, part_details_bp,
     # HHP Blueprints
     connect_hhp_bp, checkHhpInitialTiming_bp, get_hhp_loco_timings_bp, checkHhpObservations_bp,
     fetch_hhp_observations_bp, save_hhp_observation_bp, updateHhpObservations_bp,

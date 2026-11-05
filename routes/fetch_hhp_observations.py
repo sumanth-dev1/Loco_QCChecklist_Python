@@ -26,8 +26,15 @@ def fetch_hhp_observations():
         cursor = conn.cursor(dictionary=True, buffered=True)
         observations = []
 
+        try:
+            cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+        except Exception:
+            has_atr_col = False
+        atr_col_expr = ", atr_serial" if has_atr_col else ", NULL as atr_serial"
+
         for table_name in TABLE_NAMES:
-            barcode_select = ", barcode" if table_name == "verify_serial_numbers_of_equipment_as_per_ic" else ", NULL as barcode"
+            barcode_select = f", barcode {atr_col_expr}" if table_name == "verify_serial_numbers_of_equipment_as_per_ic" else ", NULL as barcode, NULL as atr_serial"
             sql = f"SELECT S_no, observation_text, observation_status, remarks, image_path, created_at, updated_at {barcode_select} FROM `{table_name}` WHERE loco_id = %s"
             cursor.execute(sql, (loco_id,))
             rows = cursor.fetchall()
@@ -50,6 +57,7 @@ def fetch_hhp_observations():
                     'remarks': row['remarks'],
                     'image_paths': image_paths,
                     'barcode': row.get('barcode'),
+                    'atr_serial': row.get('atr_serial'),
                     'created_at': str(row['created_at']) if row.get('created_at') else None,
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None
                 })
