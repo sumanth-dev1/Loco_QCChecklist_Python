@@ -1,8 +1,9 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import os, hashlib, requests
+import hashlib, requests, urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from flask import Blueprint, request, jsonify, session
-from db import get_connection
+from db import get_connection, get_hhp_connection
 
 upload_to_wfms_bp = Blueprint('upload_to_wfms', __name__)
 
@@ -17,17 +18,32 @@ def upload_to_wfms():
     activity_id = request.form.get('activityId')
     doc_id = request.form.get('docId')
     wfms_token = request.form.get('wfms_token', '')
+    is_hhp = request.form.get('is_hhp') == '1'
 
     if not all([report_id, activity_id, doc_id, wfms_token]):
         return jsonify({'success': False, 'message': 'Missing required parameters (reportId, activityId, docId, or token).'})
 
     conn = None
+    target_db = 'hhp_loco_info' if is_hhp else 'loco_qc'
     try:
-        conn = get_connection()
+        conn = get_hhp_connection() if is_hhp else get_connection()
         cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute("SELECT file_name, last_uploaded_hash FROM report WHERE id = %s", (report_id,))
         report = cursor.fetchone()
+
+        # Fallback to the other database if not found in primary
+        if not report:
+            conn.close()
+            if target_db == 'loco_qc':
+                conn = get_hhp_connection()
+                target_db = 'hhp_loco_info'
+            else:
+                conn = get_connection()
+                target_db = 'loco_qc'
+            cursor = conn.cursor(dictionary=True, buffered=True)
+            cursor.execute("SELECT file_name, last_uploaded_hash FROM report WHERE id = %s", (report_id,))
+            report = cursor.fetchone()
 
         if not report:
             return jsonify({'success': False, 'message': 'Report not found in local database.'})
@@ -49,33 +65,26 @@ def upload_to_wfms():
             'x-app-client': 'Wizard'
         }
 
-        # Step 1: Upload file to /upload-file
+        # Push file directly to /activity/upload
         with open(file_path, 'rb') as f:
             files = {'file': (report['file_name'], f, 'application/pdf')}
-            upload_res = requests.post(f"{WFMS_BASE_URL}/upload-file", headers=headers, files=files, verify=False, timeout=60)
+            data = {
+                'activityId': activity_id,
+                'docId': doc_id
+            }
+            upload_res = requests.post(f"{WFMS_BASE_URL}/activity/upload", headers=headers, data=data, files=files, verify=False, timeout=60)
 
-        if upload_res.status_code != 200:
-            return jsonify({'success': False, 'message': f'Failed to upload file to WFMS: {upload_res.text}'})
+        res_data = upload_res.json() if upload_res.headers.get('content-type', '').startswith('application/json') else {}
 
-        upload_data = upload_res.json()
-        saved_file_id = upload_data.get('fileId') or upload_data.get('data', {}).get('fileId')
-
-        if not saved_file_id:
-            return jsonify({'success': False, 'message': 'WFMS upload succeeded but no fileId returned.'})
-
-        # Step 2: Push file metadata to activity doc slot
-        body = {
-            'activityId': activity_id,
-            'docId': doc_id,
-            'fileId': saved_file_id
-        }
-        push_res = requests.post(f"{WFMS_BASE_URL}/activity/upload-qc-file", json=body, headers={**headers, 'Content-Type': 'application/json'}, verify=False, timeout=30)
-
-        if push_res.status_code == 200:
-            cursor.execute("UPDATE report SET last_uploaded_hash = %s WHERE id = %s", (local_hash, report_id))
-            return jsonify({'success': True, 'message': 'Report successfully uploaded and attached in Loco WFMS!'})
+        if upload_res.status_code == 200 and res_data.get('status'):
+            try:
+                cursor.execute("UPDATE report SET last_uploaded_hash = %s WHERE id = %s", (local_hash, report_id))
+            except Exception:
+                pass
+            return jsonify({'success': True, 'message': 'Report pushed to Loco WFMS successfully!'})
         else:
-            return jsonify({'success': False, 'message': f'Attached file failed in WFMS: {push_res.text}'})
+            error_msg = res_data.get('message') or f"HTTP {upload_res.status_code}: {upload_res.text}"
+            return jsonify({'success': False, 'message': f'Loco WFMS Error: {error_msg}'})
 
     except Exception as e:
         return jsonify({'success': False, 'message': f'Server error: {e}'})

@@ -30,9 +30,10 @@ def wfms_proxy():
             token = request.form.get('token', '')
             headers = {
                 **headers_base,
-                'Authorization': f'Bearer {token}'
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json'
             }
-            res = requests.get(f"{WFMS_BASE_URL}/dashboard/assigned-activities", headers=headers, verify=False, timeout=30)
+            res = requests.get(f"{WFMS_BASE_URL}/activity/all?pageNo=1&pageSize=500&dashboard=1", headers=headers, verify=False, timeout=30)
             return Response(res.text, status=res.status_code, content_type='application/json')
 
         elif action == 'get_activity_details':
@@ -40,9 +41,10 @@ def wfms_proxy():
             activity_id = request.form.get('activityId', '')
             headers = {
                 **headers_base,
-                'Authorization': f'Bearer {token}'
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json'
             }
-            res = requests.get(f"{WFMS_BASE_URL}/activity/{activity_id}", headers=headers, verify=False, timeout=30)
+            res = requests.get(f"{WFMS_BASE_URL}/activity/details?activityId={activity_id}", headers=headers, verify=False, timeout=30)
             return Response(res.text, status=res.status_code, content_type='application/json')
 
         return jsonify({'status': False, 'message': 'Unknown action requested.'})

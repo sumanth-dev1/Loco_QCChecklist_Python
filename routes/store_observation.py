@@ -63,7 +63,7 @@ def store_observation():
                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 
             for obs in observations:
-                obs_text = html.escape(str(obs.get('observation_text', '')))
+                obs_text = str(obs.get('observation_text', ''))
                 remarks = html.escape(str(obs.get('remarks', ''))) if 'remarks' in obs else ''
                 sno = html.escape(str(obs.get('S_no', '')))
 

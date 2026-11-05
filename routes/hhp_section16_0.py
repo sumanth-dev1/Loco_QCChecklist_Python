@@ -86,7 +86,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NOW())
 
                 cursor.execute(sql, (
                     locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,
-                    html.escape(str(obs.get('observation_text', ''))),
+                    str(obs.get('observation_text', '')),
                     html.escape(str(obs.get('remarks', ''))),
                     s_no,
                     image_path,

@@ -23,6 +23,21 @@ sys.path.insert(0, BASE_DIR)
 import config
 
 
+def ensure_equipment_master_db():
+    """Extracts the offline equipment master SQLite DB from .gz if missing."""
+    import gzip
+    db_path = os.path.join(BASE_DIR, "database", "equipment_master.db")
+    gz_path = db_path + ".gz"
+    if not os.path.exists(db_path) and os.path.exists(gz_path):
+        print("  --> Extracting offline equipment master database for remote station inspections...")
+        try:
+            with gzip.open(gz_path, "rb") as f_in, open(db_path, "wb") as f_out:
+                f_out.writelines(f_in)
+            print("  --> Offline equipment master ready.")
+        except Exception as e:
+            print(f"  [Notice] Master extraction note: {e}")
+
+
 def get_mysql_server_connection():
     """Connects to the MySQL daemon without selecting a database."""
     try:
@@ -104,6 +119,9 @@ def migrate_loco_id_columns(cursor, db_name):
 
 
 def setup_or_migrate():
+    # Ensure offline equipment master is available for remote station technicians
+    ensure_equipment_master_db()
+
     print("=" * 70)
     print("LOCO QC - SAFE DATABASE SETUP & MIGRATION")
     print("=" * 70)
@@ -138,6 +156,10 @@ def setup_or_migrate():
                 cursor.execute("ALTER TABLE `loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode_status` VARCHAR(50) NULL")
             except Exception:
                 pass
+            try:
+                cursor.execute("ALTER TABLE `loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
             print("  --> 'loco_info' is fully verified and ready.\n")
         else:
             print("[INSTALL] 'loco_info' database not found. Creating fresh database...")
@@ -161,6 +183,18 @@ def setup_or_migrate():
             print(f"[PRESERVED] Found existing 'hhp_loco_info' database ({hhp_table_count} tables).")
             print("  --> ZERO DATA LOSS: Existing HHP tables and records are 100% UNTOUCHED.")
             migrate_loco_id_columns(cursor, "hhp_loco_info")
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode` VARCHAR(255) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode_status` VARCHAR(50) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
             print("  --> 'hhp_loco_info' is fully verified and ready.\n")
         else:
             print("[INSTALL] 'hhp_loco_info' database not found. Creating fresh HHP database...")

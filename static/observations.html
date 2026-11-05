@@ -360,6 +360,9 @@
           if (obs.barcode && String(obs.barcode).trim() !== "") {
             observationContent += " " + String(obs.barcode).trim();
           }
+          if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+            observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+          }
           if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
             let heightMatch = statusText.match(/\(Height:\s*(\d+)\s*(?:mm)?\)/i);
             if (heightMatch) {
@@ -398,6 +401,7 @@
             case 'Welding done':
             case 'Earthing done':
             case 'Matching':
+            case 'Manual':
             case 'Coating done':
             case 'Locked':
             case 'Applied':
@@ -706,11 +710,25 @@
           finalY = 10;
         }
 
-        const totalPointsFixed = 183;
-        const closedPoints = observationsArray.filter(obs => {
+        const closedStatuses = [
+          "Available", "Present", "Ok", "Yes", "Routing Done", "Fixed", "Secured",
+          "Installed", "Connected", "Aligned", "Torquing done", "Positioning done",
+          "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable",
+          "Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented",
+          "Cable Ties Implemented", "Locked", "Verified and ok", "No but accepted", "No But Accepted",
+          "Accepted with Deviation", "Accepted with deviation", "Completed"
+        ];
+
+        const closedSet = new Set();
+        observationsArray.forEach(obs => {
           let baseStatus = obs.observation_status ? obs.observation_status.replace(/\s*\(\s*Height:.*?\s*\)/i, '').replace(/\n/g, '').trim() : "";
-          return ["Available", "Present", "Yes", "Routing Done", "Fixed", "Secured", "Installed", "Connected", "Aligned", "Torquing done", "Positioning done", "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented", "Locked", "Verified and ok", "No but accepted", "No But Accepted", "Accepted with Deviation", "Accepted with deviation"].includes(baseStatus);
-        }).length;
+          if (baseStatus && closedStatuses.includes(baseStatus)) {
+            closedSet.add(String(obs.S_no).trim());
+          }
+        });
+
+        const totalPointsFixed = 183;
+        const closedPoints = closedSet.size;
         const openPoints = totalPointsFixed - closedPoints;
 
 
@@ -1184,22 +1202,6 @@
         }
 
         // --- Pending Items Detailed Section ---
-        const closedStatuses = [
-          "Available", "Present", "Ok", "Yes", "Routing Done", "Fixed", "Secured",
-          "Installed", "Connected", "Aligned", "Torquing done", "Positioning done",
-          "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable",
-          "Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented",
-          "Locked", "Verified and ok", "No but accepted", "No But Accepted",
-          "Accepted with Deviation", "Accepted with deviation", "Completed"
-        ];
-
-        const closedSet = new Set();
-        observationsArray.forEach(obs => {
-          let baseStatus = obs.observation_status ? obs.observation_status.replace(/\s*\(\s*Height:.*?\s*\)/i, '').replace(/\n/g, '').trim() : "";
-          if (baseStatus && closedStatuses.includes(baseStatus)) {
-            closedSet.add(String(obs.S_no).trim());
-          }
-        });
 
         const sectionTitles = {
           1: "DOCUMENT VERIFICATION",
