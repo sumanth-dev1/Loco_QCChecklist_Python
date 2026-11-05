@@ -63,7 +63,20 @@ def hhp_section2_0():
 
             cursor.execute("DELETE FROM `verify_serial_numbers_of_equipment_as_per_ic` WHERE loco_id = %s", (locoID,))
 
-            sql = """INSERT INTO `verify_serial_numbers_of_equipment_as_per_ic` 
+            try:
+                cursor.execute("ALTER TABLE `verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
+
+            cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+
+            if has_atr_col:
+                sql = """INSERT INTO `verify_serial_numbers_of_equipment_as_per_ic` 
+(loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, remarks, barcode, atr_serial, S_no, image_path, observation_status, section_id, created_at, updated_at) 
+VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NOW())"""
+            else:
+                sql = """INSERT INTO `verify_serial_numbers_of_equipment_as_per_ic` 
 (loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, remarks, barcode, S_no, image_path, observation_status, section_id, created_at, updated_at) 
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NOW())"""
 
@@ -85,17 +98,32 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NO
                                        ('hhp_section', locoID, s_no, img_p, created_at))
 
                 barcode = obs.get('barcode_kavach_main_unit') or obs.get('barcode')
-                cursor.execute(sql, (
-                    locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,
-                    str(obs.get('observation_text', '')),
-                    html.escape(str(obs.get('remarks', ''))),
-                    barcode,
-                    s_no,
-                    image_path,
-                    html.escape(str(obs.get('observation_status', ''))),
-                    sectionID,
-                    created_at
-                ))
+                atr_serial = obs.get('atr_serial')
+                if has_atr_col:
+                    cursor.execute(sql, (
+                        locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,
+                        str(obs.get('observation_text', '')),
+                        html.escape(str(obs.get('remarks', ''))),
+                        barcode,
+                        atr_serial,
+                        s_no,
+                        image_path,
+                        html.escape(str(obs.get('observation_status', ''))),
+                        sectionID,
+                        created_at
+                    ))
+                else:
+                    cursor.execute(sql, (
+                        locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,
+                        str(obs.get('observation_text', '')),
+                        html.escape(str(obs.get('remarks', ''))),
+                        barcode,
+                        s_no,
+                        image_path,
+                        html.escape(str(obs.get('observation_status', ''))),
+                        sectionID,
+                        created_at
+                    ))
 
             return jsonify({
                 'success': True,

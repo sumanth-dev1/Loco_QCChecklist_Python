@@ -138,6 +138,10 @@ def setup_or_migrate():
                 cursor.execute("ALTER TABLE `loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode_status` VARCHAR(50) NULL")
             except Exception:
                 pass
+            try:
+                cursor.execute("ALTER TABLE `loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
             print("  --> 'loco_info' is fully verified and ready.\n")
         else:
             print("[INSTALL] 'loco_info' database not found. Creating fresh database...")
@@ -161,6 +165,18 @@ def setup_or_migrate():
             print(f"[PRESERVED] Found existing 'hhp_loco_info' database ({hhp_table_count} tables).")
             print("  --> ZERO DATA LOSS: Existing HHP tables and records are 100% UNTOUCHED.")
             migrate_loco_id_columns(cursor, "hhp_loco_info")
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode` VARCHAR(255) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode_status` VARCHAR(50) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
             print("  --> 'hhp_loco_info' is fully verified and ready.\n")
         else:
             print("[INSTALL] 'hhp_loco_info' database not found. Creating fresh HHP database...")

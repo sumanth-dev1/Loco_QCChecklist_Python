@@ -269,6 +269,9 @@
           if (obs.barcode && String(obs.barcode).trim() !== "") {
             observationContent += " " + String(obs.barcode).trim();
           }
+          if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+            observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+          }
 
           if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
             let heightMatch = statusText.match(/\(\s*Height:\s*(\d+)\s*(?:mm)?\s*\)/i);
@@ -309,6 +312,7 @@
             case 'Welding done':
             case 'Earthing done':
             case 'Matching':
+            case 'Manual':
             case 'Coating done':
             case 'Locked':
             case 'Applied':
