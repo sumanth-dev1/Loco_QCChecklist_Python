@@ -1,19 +1,56 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import urllib.parse
+import sqlite3
+import gzip
 import requests
 from flask import Blueprint, request, jsonify, Response
 import config
 
 part_details_bp = Blueprint('part_details', __name__)
 
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'equipment_master.db')
+GZ_PATH = DB_PATH + '.gz'
+
+def ensure_master_db():
+    """Extracts the offline equipment master SQLite DB from .gz if missing."""
+    if not os.path.exists(DB_PATH) and os.path.exists(GZ_PATH):
+        try:
+            with gzip.open(GZ_PATH, 'rb') as f_in, open(DB_PATH, 'wb') as f_out:
+                f_out.writelines(f_in)
+        except Exception as e:
+            print(f"Notice: Failed to extract equipment_master.db: {e}")
+
+def query_offline_master(part_no_str):
+    """
+    Fast indexed lookup against the embedded SQLite equipment master database.
+    Works 100% offline at remote railway stations, tracks, and sheds with no internet.
+    """
+    ensure_master_db()
+    if not os.path.exists(DB_PATH):
+        return None
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no = ? LIMIT 1", (part_no_str,))
+        row = cur.fetchone()
+        conn.close()
+        if row:
+            return {
+                "matched": True,
+                "type": row[4],
+                "partNo": row[0],
+                "name": row[1],
+                "systemCode": row[2],
+                "level": row[3]
+            }
+    except Exception as e:
+        print(f"Notice: Offline master query error: {e}")
+    return None
+
 @part_details_bp.route('/api/part-details', methods=['GET'])
 @part_details_bp.route('/api/part-details/<path:part_no>', methods=['GET'])
 def get_part_details(part_no=None):
-    """
-    Directly queries the actual Configuration API (which queries the actual MongoDB database).
-    No local files or local fallback databases are used.
-    """
     if not part_no:
         part_no = (request.args.get('partNo') or '').strip()
     else:
@@ -26,33 +63,52 @@ def get_part_details(part_no=None):
             'message': 'Parameter partNo is required.'
         }), 400
 
-    base_url = getattr(config, 'CONFIG_API_BASE_URL', 'http://localhost:6015/api/configuration').rstrip('/')
-    headers = {
-        'User-Agent': 'Loco-QC-Checklist-Backend',
-        'Accept': 'application/json'
-    }
+    # 1. Attempt live central Configuration API first if online/reachable
+    base_url = getattr(config, 'CONFIG_API_BASE_URL', '').rstrip('/')
+    if base_url:
+        headers = {
+            'User-Agent': 'Loco-QC-Checklist-Backend',
+            'Accept': 'application/json'
+        }
+        quoted_part = urllib.parse.quote(part_no, safe='')
+        target_urls = [
+            f"{base_url}/part-details/{quoted_part}",
+            f"{base_url}/part-details?partNo={quoted_part}"
+        ]
 
-    quoted_part = urllib.parse.quote(part_no, safe='')
-    target_urls = [
-        f"{base_url}/part-details/{quoted_part}",
-        f"{base_url}/part-details?partNo={quoted_part}"
-    ]
+        for url in target_urls:
+            try:
+                resp = requests.get(url, headers=headers, timeout=2)
+                if resp.status_code == 200:
+                    out_resp = Response(resp.text, status=200, content_type='application/json')
+                    out_resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    out_resp.headers['Pragma'] = 'no-cache'
+                    out_resp.headers['Expires'] = '0'
+                    return out_resp
+                elif resp.status_code == 404:
+                    # Explicit 404 from live API: break to fallback check
+                    break
+            except requests.exceptions.RequestException:
+                # Live API offline or no network at railway station -> fall back seamlessly to offline master
+                pass
 
-    last_error = None
-    for url in target_urls:
-        try:
-            resp = requests.get(url, headers=headers, timeout=5)
-            # Pass through the exact response from the actual Configuration API and actual DB
-            out_resp = Response(resp.text, status=resp.status_code, content_type='application/json')
-            out_resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            out_resp.headers['Pragma'] = 'no-cache'
-            out_resp.headers['Expires'] = '0'
-            return out_resp
-        except requests.exceptions.RequestException as e:
-            last_error = e
+    # 2. Offline master fallback: works on any laptop, anywhere, with zero internet or MongoDB
+    master_result = query_offline_master(part_no)
+    if master_result:
+        out_resp = jsonify({
+            'status': True,
+            'matched': True,
+            'message': 'Part number matched',
+            'data': master_result
+        })
+        out_resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        out_resp.headers['Pragma'] = 'no-cache'
+        out_resp.headers['Expires'] = '0'
+        return out_resp, 200
 
+    # 3. Not found anywhere
     return jsonify({
         'status': False,
         'matched': False,
-        'message': f'Unable to connect to Configuration API at {base_url}. Please ensure the service is running.'
-    }), 503
+        'message': f'Part number {part_no} not found in equipment database'
+    }), 404

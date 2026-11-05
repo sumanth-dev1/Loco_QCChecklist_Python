@@ -23,6 +23,21 @@ sys.path.insert(0, BASE_DIR)
 import config
 
 
+def ensure_equipment_master_db():
+    """Extracts the offline equipment master SQLite DB from .gz if missing."""
+    import gzip
+    db_path = os.path.join(BASE_DIR, "database", "equipment_master.db")
+    gz_path = db_path + ".gz"
+    if not os.path.exists(db_path) and os.path.exists(gz_path):
+        print("  --> Extracting offline equipment master database for remote station inspections...")
+        try:
+            with gzip.open(gz_path, "rb") as f_in, open(db_path, "wb") as f_out:
+                f_out.writelines(f_in)
+            print("  --> Offline equipment master ready.")
+        except Exception as e:
+            print(f"  [Notice] Master extraction note: {e}")
+
+
 def get_mysql_server_connection():
     """Connects to the MySQL daemon without selecting a database."""
     try:
@@ -104,6 +119,9 @@ def migrate_loco_id_columns(cursor, db_name):
 
 
 def setup_or_migrate():
+    # Ensure offline equipment master is available for remote station technicians
+    ensure_equipment_master_db()
+
     print("=" * 70)
     print("LOCO QC - SAFE DATABASE SETUP & MIGRATION")
     print("=" * 70)
