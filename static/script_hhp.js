@@ -104,6 +104,7 @@ async function showSection(section) {
     newActiveBtn.classList.add("active");
   }
 
+
   // 4) Finally, do the rest of your code that actually loads the new section's content
   if (section !== "0.0") {
 
@@ -774,12 +775,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -846,12 +841,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -919,12 +908,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -986,12 +969,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1055,12 +1032,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1124,12 +1095,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1193,12 +1158,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1262,12 +1221,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1332,12 +1285,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1400,12 +1347,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1471,12 +1412,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1541,12 +1476,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
@@ -1611,12 +1540,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1678,12 +1601,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1746,12 +1663,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1813,12 +1724,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1881,12 +1786,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -1949,12 +1848,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2017,12 +1910,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2085,12 +1972,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2152,12 +2033,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2219,12 +2094,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2286,12 +2155,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2353,12 +2216,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2420,12 +2277,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2487,12 +2338,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2555,12 +2400,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2623,12 +2462,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2691,12 +2524,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2759,12 +2586,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2827,12 +2648,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2896,12 +2711,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -2964,12 +2773,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -3032,12 +2835,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -3100,12 +2897,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -3169,12 +2960,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -3237,12 +3022,6 @@ async function showSection(section) {
         style="width: 140px; padding: 5px; font-size: 14px;" 
         title="ATR Serial Number"
       />
-      <button 
-        type="button" 
-        class="fetch-atr-btn" 
-        onclick="fetchAtrSerial(this)" 
-        style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-      >Fetch</button>
     </div>
     <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td><td class="select">
@@ -3292,6 +3071,7 @@ async function showSection(section) {
               onclick="updateObservation('2_0')">
         Update
       </button>
+    <button type="button" id="fetch-unit-atr-btn-sec" onclick="fetchUnitAtr(this)" style="display: inline-block; padding: 10px 20px; font-size: 15px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Fetch</button>
     <button type="button" id= "save-btn" style = "display: inline-block;" onclick="saveObservation('2_0')">Save</button>
      <button id="get-details-btn" onclick="getDetails()">Get Details</button>
 </div>`;
@@ -9167,12 +8947,6 @@ oninput="
                 value="${observation.atr_serial || ''}"
                 oninput="if(typeof enableUpdateButton==='function') enableUpdateButton(); if(typeof markDataAsUnsaved==='function') markDataAsUnsaved();"
               />
-              <button 
-                type="button" 
-                class="fetch-atr-btn" 
-                onclick="fetchAtrSerial(this)" 
-                style="padding: 5px 12px; font-size: 13px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
-              >Fetch</button>
             </div>
             <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
           </td>
@@ -10556,4 +10330,150 @@ async function fetchAtrSerial(btn) {
     if (typeof enableUpdateButton === "function") enableUpdateButton();
     if (typeof markDataAsUnsaved === "function") markDataAsUnsaved();
   }
+}
+
+
+// Function to fetch and verify ATR details for all equipment items in Section 2.0 at once
+async function fetchUnitAtr(callerBtn) {
+  const table = document.querySelector("#observations-section-2_0") || 
+                document.querySelector("table.observations");
+  if (!table) {
+    alert("Section 2.0 table not found.");
+    return;
+  }
+
+  const rows = table.querySelectorAll("tbody tr");
+  if (!rows || rows.length === 0) {
+    alert("No equipment rows found to verify.");
+    return;
+  }
+
+  const itemsToFetch = [];
+  rows.forEach((tr) => {
+    const bcInput = tr.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+    const atrInput = tr.querySelector(".atr-serial-input");
+    const statusDiv = tr.querySelector(".atr-status-msg");
+    const selectEl = tr.querySelector("select");
+    const remarksEl = tr.querySelector(".remarks textarea");
+
+    const scannedValue = (bcInput ? bcInput.value : "").trim();
+    const atrValue = (atrInput ? atrInput.value : "").trim();
+    const partNo = scannedValue || atrValue;
+
+    if (partNo) {
+      itemsToFetch.push({
+        tr,
+        bcInput,
+        atrInput,
+        statusDiv,
+        selectEl,
+        remarksEl,
+        scannedValue,
+        partNo
+      });
+    }
+  });
+
+  if (itemsToFetch.length === 0) {
+    alert("Please scan or enter at least one equipment barcode or serial number first.");
+    return;
+  }
+
+  const allBtns = document.querySelectorAll("#fetch-unit-atr-btn, #fetch-unit-atr-btn-sec");
+  allBtns.forEach(b => {
+    b.disabled = true;
+    b.dataset.origText = b.textContent;
+    b.textContent = "⏳ Fetching...";
+  });
+
+  let matchedCount = 0;
+  let manualCount = 0;
+
+  const promises = itemsToFetch.map(async (item) => {
+    const { atrInput, statusDiv, selectEl, remarksEl, scannedValue, partNo } = item;
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #007bff;">Fetching ATR...</span>';
+    }
+
+    try {
+      const response = await fetch(`/api/part-details?partNo=${encodeURIComponent(partNo)}`, {
+        cache: "no-store"
+      });
+      const result = await response.json();
+
+      if (response.ok && result && (result.status === true || (result.data && result.data.matched === true))) {
+        const data = result.data || {};
+        const fetchedSerial = (data.partNo ? String(data.partNo).trim() : partNo);
+        const partName = data.name || data.description || "";
+
+        if (atrInput) {
+          atrInput.value = fetchedSerial;
+          atrInput.style.backgroundColor = "#e8f8f5";
+          atrInput.style.borderColor = "#2ecc71";
+        }
+
+        const isMatch = scannedValue 
+          ? (scannedValue.toLowerCase() === fetchedSerial.toLowerCase() || data.matched === true)
+          : (data.matched === true);
+
+        if (isMatch) {
+          matchedCount++;
+          if (selectEl) {
+            selectEl.value = "Matching";
+            if (typeof highlightSelect === "function") highlightSelect(selectEl);
+          }
+          if (statusDiv) {
+            statusDiv.innerHTML = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${partName ? '(' + partName + ')' : ''}</span>`;
+          }
+        } else {
+          manualCount++;
+          if (selectEl) {
+            selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+            if (typeof highlightSelect === "function") highlightSelect(selectEl);
+          }
+          if (statusDiv) {
+            statusDiv.innerHTML = '<span style="color: #e67e22; font-weight: bold;">✖ Mismatch &rarr; Set to Manual</span>';
+          }
+        }
+      } else {
+        manualCount++;
+        if (selectEl) {
+          selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        const errorMsg = (result && result.message) ? result.message : "Not Found";
+        if (statusDiv) {
+          statusDiv.innerHTML = `<span style="color: #e67e22; font-weight: bold;">✖ ${errorMsg} &rarr; Set to Manual</span>`;
+        }
+        if (remarksEl && !remarksEl.value.trim()) {
+          remarksEl.placeholder = "Manual verification remarks...";
+        }
+      }
+    } catch (err) {
+      console.error("Fetch unit ATR error:", err);
+      manualCount++;
+      if (selectEl) {
+        selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+        if (typeof highlightSelect === "function") highlightSelect(selectEl);
+      }
+      if (statusDiv) {
+        statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: bold;">⚠️ Verification error &rarr; Manual</span>';
+      }
+    }
+  });
+
+  await Promise.all(promises);
+
+  allBtns.forEach(b => {
+    b.disabled = false;
+    b.textContent = b.dataset.origText || "Fetch";
+  });
+
+  if (typeof enableUpdateButton === "function") enableUpdateButton();
+  if (typeof markDataAsUnsaved === "function") markDataAsUnsaved();
+  if (typeof unsavedChanges !== "undefined") unsavedChanges = true;
+
+  alert(`Unit ATR Verification Complete:
+✔ ${matchedCount} Matched
+✖ ${manualCount} Set to Manual`);
 }

@@ -63,7 +63,21 @@ def get_part_details(part_no=None):
             'message': 'Parameter partNo is required.'
         }), 400
 
-    # 1. Attempt live central Configuration API first if online/reachable
+    # 1. Offline master lookup first: instant (0ms), works on any laptop/tab offline at remote stations
+    master_result = query_offline_master(part_no)
+    if master_result:
+        out_resp = jsonify({
+            'status': True,
+            'matched': True,
+            'message': 'Part number matched',
+            'data': master_result
+        })
+        out_resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        out_resp.headers['Pragma'] = 'no-cache'
+        out_resp.headers['Expires'] = '0'
+        return out_resp, 200
+
+    # 2. Live central Configuration API (fallback if online and part is new/unregistered locally)
     base_url = getattr(config, 'CONFIG_API_BASE_URL', '').rstrip('/')
     if base_url:
         headers = {
@@ -86,25 +100,10 @@ def get_part_details(part_no=None):
                     out_resp.headers['Expires'] = '0'
                     return out_resp
                 elif resp.status_code == 404:
-                    # Explicit 404 from live API: break to fallback check
                     break
             except requests.exceptions.RequestException:
-                # Live API offline or no network at railway station -> fall back seamlessly to offline master
+                # Live API offline or no network at railway station -> pass silently
                 pass
-
-    # 2. Offline master fallback: works on any laptop, anywhere, with zero internet or MongoDB
-    master_result = query_offline_master(part_no)
-    if master_result:
-        out_resp = jsonify({
-            'status': True,
-            'matched': True,
-            'message': 'Part number matched',
-            'data': master_result
-        })
-        out_resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        out_resp.headers['Pragma'] = 'no-cache'
-        out_resp.headers['Expires'] = '0'
-        return out_resp, 200
 
     # 3. Not found anywhere
     return jsonify({
