@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import html, os
+import html, os, re
 from flask import Blueprint, request, jsonify
 from db import get_connection
 
@@ -174,6 +174,13 @@ def generateReport():
             tbl_obs = cursor.fetchall()
 
             for obs in tbl_obs:
+                if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
+                    if not obs.get('barcode') and obs.get('observation_text'):
+                        m = re.search(r'[:\-]?\s*(\d{10,15})\b', str(obs['observation_text']))
+                        if m:
+                            obs['barcode'] = m.group(1)
+                    if not obs.get('atr_serial') and obs.get('barcode'):
+                        obs['atr_serial'] = obs.get('barcode')
                 if obs.get('observation_text'):
                     obs['observation_text'] = html.unescape(obs['observation_text'])
                     if '&lt;' in obs['observation_text']:

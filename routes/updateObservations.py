@@ -81,14 +81,15 @@ def updateObservations():
             s_no = obs.get('S_no')
             remarks = obs.get('remarks', '')
             status = obs.get('observation_status', '')
-            new_barcode = str(obs.get('barcode', '')).strip()
+            new_barcode = str(obs.get('barcode') or obs.get('barcode_kavach_main_unit') or '').strip()
+            new_atr = str(obs.get('atr_serial') or new_barcode).strip()
             new_height = str(obs.get('height', '')).strip()
             client_obs_text = str(obs.get('observation_text', '')).strip()
             image_paths = obs.get('image_paths', [])
 
             cursor.execute(
-                f"SELECT observation_text FROM {table_name} WHERE loco_id = %s AND section_id = %s AND s_no = %s",
-                (loco_id, section_id, s_no)
+                f"SELECT observation_text FROM {table_name} WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s",
+                (loco_id, section_id, section_id, section_id, s_no)
             )
             existing = cursor.fetchone()
 
@@ -150,18 +151,17 @@ def updateObservations():
                         pass
                     cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
                     has_atr_col = bool(cursor.fetchone())
-                    new_atr = (item.get('atr_serial') or '').strip()
 
-                    if has_atr_col and new_atr:
+                    if has_atr_col:
                         update_sql = f"""UPDATE {table_name}
                             SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, atr_serial = %s, observation_status = %s, remarks = %s, updated_at = NOW()
-                            WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
-                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, new_atr, status, remarks, loco_id, section_id, s_no))
+                            WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s"""
+                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, new_atr, status, remarks, loco_id, section_id, section_id, section_id, s_no))
                     else:
                         update_sql = f"""UPDATE {table_name}
                             SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, observation_status = %s, remarks = %s, updated_at = NOW()
-                            WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
-                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, s_no))
+                            WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s"""
+                        cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, section_id, section_id, s_no))
                 else:
                     update_sql = f"""UPDATE {table_name}
                         SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, observation_status = %s, remarks = %s, updated_at = NOW()
@@ -184,10 +184,22 @@ def updateObservations():
                         img_stmt.close()
             else:
                 if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
-                    insert_sql = f"""INSERT INTO {table_name} 
-                        (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, observation_status, remarks, created_at, updated_at)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
-                    cursor.execute(insert_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text.strip(), new_barcode, status, remarks))
+                    try:
+                        cursor.execute("ALTER TABLE verify_serial_numbers_of_equipment_as_per_ic ADD COLUMN atr_serial VARCHAR(255) NULL")
+                    except Exception:
+                        pass
+                    cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
+                    has_atr_col = bool(cursor.fetchone())
+                    if has_atr_col:
+                        insert_sql = f"""INSERT INTO {table_name} 
+                            (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, atr_serial, observation_status, remarks, created_at, updated_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+                        cursor.execute(insert_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text.strip(), new_barcode, new_atr, status, remarks))
+                    else:
+                        insert_sql = f"""INSERT INTO {table_name} 
+                            (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, observation_status, remarks, created_at, updated_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+                        cursor.execute(insert_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text.strip(), new_barcode, status, remarks))
                 else:
                     insert_sql = f"""INSERT INTO {table_name} 
                         (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, observation_status, remarks, created_at, updated_at)

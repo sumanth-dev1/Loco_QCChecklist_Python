@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import html
+import html, re
 from flask import Blueprint, request, jsonify
 from db import get_hhp_connection
 
@@ -103,6 +103,13 @@ def generateHhpReport():
                     if '&lt;' in obs_text:
                         obs_text = html.unescape(obs_text)
 
+                row_barcode = row.get('barcode')
+                if not row_barcode and obs_text:
+                    m = re.search(r'[:\-]?\s*(\d{10,15})\b', str(obs_text))
+                    if m:
+                        row_barcode = m.group(1)
+                row_atr = row.get('atr_serial') or row_barcode
+
                 all_observations.append({
                     'S_no': row['S_no'],
                     'observation_text': obs_text,
@@ -111,8 +118,8 @@ def generateHhpReport():
                     'image_path': ','.join(img_paths) if img_paths else (row['image_path'] or ''),
                     'image_paths': img_paths,
                     'images': valid_web_images,
-                    'barcode': row.get('barcode'),
-                    'atr_serial': row.get('atr_serial'),
+                    'barcode': row_barcode,
+                    'atr_serial': row_atr,
                     'created_at': str(row['created_at']) if row.get('created_at') else None,
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None,
                     'section_id': row.get('section_id')

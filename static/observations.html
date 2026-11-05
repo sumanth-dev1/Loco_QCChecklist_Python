@@ -12,17 +12,22 @@
   <script src="libs/jspdf.plugin.autotable.min.js"></script>
   <script>
     function formatDescription(description) {
-      let decoded = (description || "")
+      if (!description) return "";
+      let decoded = description
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
         .replace(/&amp;/g, "&")
         .replace(/&quot;/g, '"')
         .replace(/&#039;/g, "'");
+      let s = decoded
+        .replace(/<[^>]*>/g, "")
+        .trim()
+        .replace(/\s+/g, " ");
+      if (s.includes("Serial:") || s.includes("Serial / ATR:") || s.includes("ATR:")) {
+        return s;
+      }
       return (
-        decoded
-          .replace(/<[^>]*>/g, "")
-          .trim()
-          .replace(/\s+/g, " ")
+        s
           .replace(/:+(?=\s*\d)/g, "")
           .replace(/:+$/, "")
           .replace(/ (\d+)$/, " - $1")
@@ -357,11 +362,29 @@
           let statusText = obs.observation_status || "";
           let heightValue = "";
           let observationContent = obs.observation_text || "";
-          if (obs.barcode && String(obs.barcode).trim() !== "") {
-            observationContent += " " + String(obs.barcode).trim();
-          }
-          if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
-            observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+
+          const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
+          if (isSection2) {
+            let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]\s*\d{10,15}.*$/, '').trim();
+            baseDesc = baseDesc.replace(/:+$/, '').trim();
+            const scBarcode = (obs.barcode || '').trim();
+            const scAtr = (obs.atr_serial || '').trim();
+            if (scBarcode && scAtr && scBarcode === scAtr) {
+              observationContent = `${baseDesc} - Serial / ATR: ${scBarcode}`;
+            } else if (scBarcode && scAtr) {
+              observationContent = `${baseDesc} - Serial: ${scBarcode} (ATR: ${scAtr})`;
+            } else if (scBarcode) {
+              observationContent = `${baseDesc} - Serial: ${scBarcode}`;
+            } else if (scAtr) {
+              observationContent = `${baseDesc} - ATR: ${scAtr}`;
+            }
+          } else {
+            if (obs.barcode && String(obs.barcode).trim() !== "") {
+              observationContent += " " + String(obs.barcode).trim();
+            }
+            if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+              observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+            }
           }
           if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
             let heightMatch = statusText.match(/\(Height:\s*(\d+)\s*(?:mm)?\)/i);
@@ -1028,8 +1051,29 @@
             let statusText = obs.observation_status || "";
             let heightValue = "";
             let observationContent = obs.observation_text || "";
-            if (obs.barcode && String(obs.barcode).trim() !== "") {
-              observationContent += " " + String(obs.barcode).trim();
+
+            const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
+            if (isSection2) {
+              let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]\s*\d{10,15}.*$/, '').trim();
+              baseDesc = baseDesc.replace(/:+$/, '').trim();
+              const scBarcode = (obs.barcode || '').trim();
+              const scAtr = (obs.atr_serial || '').trim();
+              if (scBarcode && scAtr && scBarcode === scAtr) {
+                observationContent = `${baseDesc} - Serial / ATR: ${scBarcode}`;
+              } else if (scBarcode && scAtr) {
+                observationContent = `${baseDesc} - Serial: ${scBarcode} (ATR: ${scAtr})`;
+              } else if (scBarcode) {
+                observationContent = `${baseDesc} - Serial: ${scBarcode}`;
+              } else if (scAtr) {
+                observationContent = `${baseDesc} - ATR: ${scAtr}`;
+              }
+            } else {
+              if (obs.barcode && String(obs.barcode).trim() !== "") {
+                observationContent += " " + String(obs.barcode).trim();
+              }
+              if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+                observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+              }
             }
             if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
               let heightMatch = statusText.match(/\(Height:\s*(\d+)\s*(?:mm)?\)/i);

@@ -97,8 +97,8 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NO
                         cursor.execute("INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, %s)",
                                        ('hhp_section', locoID, s_no, img_p, created_at))
 
-                barcode = obs.get('barcode_kavach_main_unit') or obs.get('barcode')
-                atr_serial = obs.get('atr_serial')
+                barcode = obs.get('barcode_kavach_main_unit') or obs.get('barcode') or ''
+                atr_serial = obs.get('atr_serial') or barcode
                 if has_atr_col:
                     cursor.execute(sql, (
                         locoID, locoType, brakeType, railwayDivision, shedName, inspectionDate,

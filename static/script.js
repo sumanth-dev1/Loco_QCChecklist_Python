@@ -8616,14 +8616,14 @@ async function saveObservation(section) {
     };
 
     if (section === "2_0") {
-      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit']");
-      if (bcInput) {
-        observationPayload.barcode_kavach_main_unit = bcInput.value.trim().slice(-15);
-      }
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+      const bcVal = bcInput ? bcInput.value.trim().slice(-15) : "";
       const atrInput = row.querySelector(".atr-serial-input");
-      if (atrInput) {
-        observationPayload.atr_serial = atrInput.value.trim();
-      }
+      const atrVal = atrInput ? atrInput.value.trim() : "";
+      const serialNum = bcVal || atrVal;
+      observationPayload.barcode = serialNum;
+      observationPayload.barcode_kavach_main_unit = serialNum;
+      observationPayload.atr_serial = atrVal || serialNum;
     }
 
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
@@ -8940,6 +8940,15 @@ function updateObservationsTable(sectionID, observations, sno) {
       }
       observationContent = observationContent.replace(/(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$/i, '$1');
     }
+        let rowBarcode = (observation.barcode || "").trim();
+    let rowAtr = (observation.atr_serial || "").trim();
+    if (!rowBarcode && observation.observation_text) {
+      const match = observation.observation_text.match(/[:\-]?\s*(\d{10,15})\b/);
+      if (match) rowBarcode = match[1];
+    }
+    if (!rowAtr && rowBarcode) rowAtr = rowBarcode;
+    if (!rowBarcode && rowAtr) rowBarcode = rowAtr;
+
     if (sectionID === "2_0" && S_no !== "2.1") {
       observationContent += `<br>
         <input
@@ -8950,7 +8959,8 @@ function updateObservationsTable(sectionID, observations, sno) {
           title="Enter a number between 10 to 15 digits"
           placeholder="Scan Barcode"
           style="width: 180px; padding: 5px; font-size: 14px;"
-          value="${observation.barcode || ''}"
+          value="${rowBarcode}"
+          data-initial-value="${rowBarcode}"
 oninput="
   // Keep only digits
   let cleaned = this.value.replace(/\D/g, '');
@@ -9001,6 +9011,10 @@ oninput="
       if (S_no === "2.1") {
         atrCellContent = `<td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>`;
       } else {
+        let matchedStatusHtml = "";
+        if (rowAtr && (observation.observation_status === "Matching" || observation.observation_status === "Manual")) {
+          matchedStatusHtml = `<span style="color: ${observation.observation_status === 'Matching' ? '#27ae60' : '#e67e22'}; font-weight: bold;">✔ Matched (${rowAtr})</span>`;
+        }
         atrCellContent = `
           <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
             <div style="display: flex; gap: 6px; align-items: center;">
@@ -9010,11 +9024,12 @@ oninput="
                 id="atr-input-${rowId}"
                 placeholder="ATR Serial No" 
                 style="width: 140px; padding: 5px; font-size: 14px;" 
-                value="${observation.atr_serial || ''}"
+                value="${rowAtr}"
+                data-initial-value="${rowAtr}"
                 oninput="if(typeof enableUpdateButton==='function') enableUpdateButton(); if(typeof markDataAsUnsaved==='function') markDataAsUnsaved();"
               />
             </div>
-            <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+            <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;">${matchedStatusHtml}</div>
           </td>
         `;
       }
@@ -9364,10 +9379,14 @@ async function updateObservation(section) {
     let heightValue = "";
 
     if (section === "2_0") {
-      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit']");
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
       if (bcInput) {
         barcodeValue = bcInput.value.trim().slice(-15);
         if (bcInput.dataset.initialValue !== barcodeValue) hasChanges = true;
+      }
+      const atrInput = row.querySelector(".atr-serial-input");
+      if (atrInput && atrInput.value.trim() !== (atrInput.dataset.initialValue || "")) {
+        hasChanges = true;
       }
     } else if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       const hInput = row.querySelector(".height-input");
@@ -9432,11 +9451,15 @@ async function updateObservation(section) {
     };
 
     if (section === "2_0") {
-      rowPayload.barcode = barcodeValue;
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+      const bcVal = bcInput ? bcInput.value.trim().slice(-15) : "";
       const atrInput = row.querySelector(".atr-serial-input");
-      if (atrInput) {
-        rowPayload.atr_serial = atrInput.value.trim();
-      }
+      const atrVal = atrInput ? atrInput.value.trim() : "";
+      const serialNum = bcVal || atrVal || barcodeValue;
+      rowPayload.barcode = serialNum;
+      rowPayload.barcode_kavach_main_unit = serialNum;
+      rowPayload.atr_serial = atrVal || serialNum;
+      if (serialNum) hasChanges = true;
     }
 
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
@@ -10532,7 +10555,7 @@ async function fetchUnitAtr(callerBtn) {
   let manualCount = 0;
 
   const promises = itemsToFetch.map(async (item) => {
-    const { atrInput, statusDiv, selectEl, remarksEl, scannedValue, partNo } = item;
+    const { tr, bcInput, atrInput, statusDiv, selectEl, remarksEl, scannedValue, partNo } = item;
     if (statusDiv) {
       statusDiv.innerHTML = '<span style="color: #007bff;">Fetching ATR...</span>';
     }
@@ -10541,7 +10564,12 @@ async function fetchUnitAtr(callerBtn) {
       const response = await fetch(`/api/part-details?partNo=${encodeURIComponent(partNo)}`, {
         cache: "no-store"
       });
-      const result = await response.json();
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (jsonErr) {
+        console.warn("JSON parse error:", jsonErr);
+      }
 
       if (response.ok && result && (result.status === true || (result.data && result.data.matched === true))) {
         const data = result.data || {};
@@ -10550,8 +10578,16 @@ async function fetchUnitAtr(callerBtn) {
 
         if (atrInput) {
           atrInput.value = fetchedSerial;
+          atrInput.dataset.initialValue = fetchedSerial;
           atrInput.style.backgroundColor = "#e8f8f5";
           atrInput.style.borderColor = "#2ecc71";
+        }
+        if (bcInput && !bcInput.value.trim()) {
+          bcInput.value = fetchedSerial;
+          bcInput.dataset.initialValue = fetchedSerial;
+        }
+        if (typeof updateEditedBarcode === 'function' && tr.id) {
+          updateEditedBarcode(tr.id.replace('row-', ''), fetchedSerial);
         }
 
         const isMatch = scannedValue 
@@ -10599,7 +10635,7 @@ async function fetchUnitAtr(callerBtn) {
         if (typeof highlightSelect === "function") highlightSelect(selectEl);
       }
       if (statusDiv) {
-        statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: bold;">⚠️ Verification error &rarr; Manual</span>';
+        statusDiv.innerHTML = `<span style="color: #dc3545; font-weight: bold;">⚠️ Verification error (${err.message || 'Failed to fetch'}) &rarr; Manual</span>`;
       }
     }
   });

@@ -74,8 +74,8 @@ def section2_0():
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())"""
 
             for obs in observations:
-                barcode = obs.get('barcode_kavach_main_unit')
-                atr_serial = obs.get('atr_serial')
+                barcode = obs.get('barcode_kavach_main_unit') or obs.get('barcode') or ''
+                atr_serial = obs.get('atr_serial') or barcode
                 if has_atr_col:
                     cursor.execute(sql, (
                         loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date,

@@ -30,10 +30,16 @@ def query_offline_master(part_no_str):
     if not os.path.exists(DB_PATH):
         return None
     try:
+        clean_part = str(part_no_str or '').strip().strip("'\"")
+        if not clean_part:
+            return None
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
-        cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no = ? LIMIT 1", (part_no_str,))
+        cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no = ? LIMIT 1", (clean_part,))
         row = cur.fetchone()
+        if not row and len(clean_part) >= 10:
+            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no LIKE ? LIMIT 1", (f"%{clean_part}",))
+            row = cur.fetchone()
         conn.close()
         if row:
             return {
