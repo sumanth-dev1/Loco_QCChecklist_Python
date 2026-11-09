@@ -13,7 +13,22 @@ This application operates completely independently of XAMPP and Apache.
 * **Zero Frontend Modifications**: Identical UI, checklists, auto-save timers, scanner support, and observation sync.
 * **Tablet & Mobile Friendly**: Technicians can complete inspections directly from workshop tablets or phones via Wi-Fi.
 * **Safe 1-Click Database Engine**: Automated non-destructive setup and migration for both fleet databases (`setup_database.py`).
-* **One-Click Startup**: Double-click `Loco QC.lnk` on the Desktop or run `start.bat`.
+* **All-in-One Smart Launcher**: Double-click `start.bat` to auto-create `venv`, install packages, verify database, and open browser.
+
+---
+
+## ⚡ 1-Click Fast Setup (Recommended)
+
+Simply double-click **`start.bat`**!
+
+It will automatically:
+1. Detect Python (or the Windows Python launcher `py`) and create the virtual environment (`.\venv`).
+2. Upgrade `pip` and install all dependencies from `requirements.txt`.
+3. Auto-generate the `.env` configuration file (if not present).
+4. Auto-initialize and migrate both `loco_info` and `hhp_loco_info` databases and all tables without data loss.
+5. Launch the Waitress server on port `5000` and automatically open **http://localhost:5000/** in your browser!
+
+*(Default admin test login: username `12345`, password `12345`)*
 
 ---
 
@@ -27,7 +42,7 @@ loco_qc_python/
 ├── app.py                       # Main Flask application & route registrations (71 blueprints)
 ├── run.py                       # Waitress production runner (Port 5000)
 ├── requirements.txt             # Project Python dependencies
-├── start.bat                    # Server start & browser launcher
+├── start.bat                    # All-in-one smart setup & browser launcher
 ├── stop.bat                     # Server shutdown script
 ├── launch_silent.vbs            # Silent background launcher
 ├── create_shortcut.ps1          # Desktop shortcut creator
@@ -42,7 +57,7 @@ loco_qc_python/
 
 ---
 
-## 🛠️ Installation & Setup (Fresh Clone)
+## 🛠️ Manual Installation & Setup (Alternative)
 
 ### 1. Prerequisites
 * Python 3.10+ (Recommended Python 3.12)
@@ -71,19 +86,18 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Database Setup (Automated 1-Click)
-Run the automated migration engine (creates and verifies both `loco_info` and `hhp_loco_info` without data loss):
+### 4. Database Setup
+Run the automated migration engine:
 ```cmd
 python database/setup_database.py
 ```
-*(Default test login: username `12345`, password `12345`)*
 
 ---
 
 ## 🏃 Running the Application
 
 ### Option A: One-Click (Windows)
-Run `start.bat` (or use the Desktop shortcut created via `create_shortcut.ps1`).
+Double-click `start.bat` (or use the Desktop shortcut created via `create_shortcut.ps1`).
 
 ### Option B: Command Line
 ```cmd
