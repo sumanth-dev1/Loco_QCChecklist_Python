@@ -3,6 +3,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import urllib.parse
 import sqlite3
 import gzip
+import shutil
+import threading
 import requests
 from flask import Blueprint, request, jsonify, Response
 import config
@@ -11,15 +13,29 @@ part_details_bp = Blueprint('part_details', __name__)
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'database', 'equipment_master.db')
 GZ_PATH = DB_PATH + '.gz'
+_extract_lock = threading.Lock()
 
 def ensure_master_db():
-    """Extracts the offline equipment master SQLite DB from .gz if missing."""
-    if not os.path.exists(DB_PATH) and os.path.exists(GZ_PATH):
-        try:
-            with gzip.open(GZ_PATH, 'rb') as f_in, open(DB_PATH, 'wb') as f_out:
-                f_out.writelines(f_in)
-        except Exception as e:
-            print(f"Notice: Failed to extract equipment_master.db: {e}")
+    """Extracts the offline equipment master SQLite DB from .gz safely and atomically if missing."""
+    if os.path.exists(DB_PATH) and os.path.getsize(DB_PATH) > 1000000:
+        return
+    with _extract_lock:
+        if os.path.exists(DB_PATH) and os.path.getsize(DB_PATH) > 1000000:
+            return
+        if os.path.exists(GZ_PATH):
+            tmp_path = DB_PATH + '.tmp'
+            try:
+                with gzip.open(GZ_PATH, 'rb') as f_in, open(tmp_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out, length=1024 * 1024)
+                if os.path.exists(tmp_path) and os.path.getsize(tmp_path) > 1000000:
+                    os.replace(tmp_path, DB_PATH)
+            except Exception as e:
+                print(f"Notice: Failed to extract equipment_master.db: {e}")
+                if os.path.exists(tmp_path):
+                    try:
+                        os.remove(tmp_path)
+                    except Exception:
+                        pass
 
 def query_offline_master(part_no_str):
     """
@@ -35,18 +51,56 @@ def query_offline_master(part_no_str):
             return None
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
+
+        # 1. Exact match
         cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no = ? LIMIT 1", (clean_part,))
         row = cur.fetchone()
-        if not row and len(clean_part) >= 10:
-            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no LIKE ? LIMIT 1", (f"%{clean_part}",))
+
+        # 2. Tolerant match for 14-digit barcodes missing leading '5' (e.g. 16302260726022 -> 516302260726022)
+        if not row and len(clean_part) == 14 and clean_part.startswith('16'):
+            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no = ? LIMIT 1", ('5' + clean_part,))
             row = cur.fetchone()
+
+        # 3. For parts starting with '2' (e.g. Modems & components with 2 to 7 digits)
+        if not row and clean_part.startswith('2') and len(clean_part) >= 2:
+            cur.execute("""SELECT part_no, name, system_code, level, type FROM equipment_master
+                           WHERE part_no LIKE ? OR part_no LIKE ? OR part_no LIKE ?
+                           ORDER BY 
+                             CASE WHEN name LIKE '%MODEM%' THEN 0 ELSE 1 END,
+                             CASE WHEN part_no LIKE ? THEN 0 
+                                  WHEN part_no LIKE ? THEN 1 
+                                  ELSE 2 END,
+                             length(part_no) ASC
+                           LIMIT 1""",
+                        (f"%_{clean_part}_%", f"{clean_part}%", f"%{clean_part}%", f"%_{clean_part}_%", f"{clean_part}%"))
+            row = cur.fetchone()
+
+        # 4. General prefix match (>= 3 chars)
+        if not row and len(clean_part) >= 3:
+            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no LIKE ? ORDER BY length(part_no) ASC LIMIT 1", (f"{clean_part}%",))
+            row = cur.fetchone()
+
+        # 5. General suffix match (>= 3 chars)
+        if not row and len(clean_part) >= 3:
+            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no LIKE ? ORDER BY length(part_no) ASC LIMIT 1", (f"%{clean_part}",))
+            row = cur.fetchone()
+
+        # 6. General infix match (>= 4 chars)
+        if not row and len(clean_part) >= 4:
+            cur.execute("SELECT part_no, name, system_code, level, type FROM equipment_master WHERE part_no LIKE ? ORDER BY length(part_no) ASC LIMIT 1", (f"%{clean_part}%",))
+            row = cur.fetchone()
+
         conn.close()
         if row:
+            matched_pn = row[0]
+            display_pn = clean_part if clean_part in matched_pn else matched_pn
             return {
                 "matched": True,
                 "type": row[4],
-                "partNo": row[0],
+                "partNo": display_pn,
+                "masterPartNo": matched_pn,
                 "name": row[1],
+                "description": row[1],
                 "systemCode": row[2],
                 "level": row[3]
             }

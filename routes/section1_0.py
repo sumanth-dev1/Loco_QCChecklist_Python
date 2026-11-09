@@ -49,6 +49,8 @@ def section1_0():
             else:
                 created_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+            cursor.execute("DELETE FROM document_verification_table WHERE loco_id = %s", (locoID,))
+
             sql = """INSERT INTO document_verification_table 
 (loco_id, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, remarks, S_no, image_path, observation_status, section_id, created_at, updated_at) 
 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, COALESCE(%s, ''), %s, %s, %s, NOW())"""

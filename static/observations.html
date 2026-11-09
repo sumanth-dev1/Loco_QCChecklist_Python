@@ -23,7 +23,7 @@
         .replace(/<[^>]*>/g, "")
         .trim()
         .replace(/\s+/g, " ");
-      if (s.includes("Serial:") || s.includes("Serial / ATR:") || s.includes("ATR:")) {
+      if (s.includes("Actual:") || s.includes("Actual / ATR:") || s.includes("Serial:") || s.includes("Serial / ATR:") || s.includes("ATR:")) {
         return s;
       }
       return (
@@ -297,8 +297,21 @@
         <tbody></tbody>
       `;
       const tbody = table.querySelector("tbody");
+
+      // Deduplicate observations by S_no so checkpoints never repeat
+      const uniqueObsMap = new Map();
+      (observations || []).forEach(obs => {
+        if (obs && obs.S_no) {
+          const snoKey = String(obs.S_no).trim();
+          if (!uniqueObsMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+            uniqueObsMap.set(snoKey, obs);
+          }
+        }
+      });
+      const uniqueObservations = Array.from(uniqueObsMap.values());
+
       const grouped = {};
-      observations.forEach(obs => {
+      uniqueObservations.forEach(obs => {
         const section = obs.S_no && typeof obs.S_no === 'string' && obs.S_no.includes('.') ? obs.S_no.split('.')[0] : null;
         if (!section) {
           console.warn(`Invalid S_no: ${obs.S_no}`);
@@ -307,7 +320,7 @@
         if (!grouped[section]) grouped[section] = [];
         grouped[section].push(obs);
       });
-      let closedPoints = 0;
+      const closedSet = new Set();
       const totalPoints = 183;
       Object.keys(grouped).sort((a, b) => Number(a) - Number(b)).forEach(section => {
         const sectionRows = grouped[section];
@@ -365,16 +378,16 @@
 
           const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
           if (isSection2) {
-            let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]\s*\d{10,15}.*$/, '').trim();
-            baseDesc = baseDesc.replace(/:+$/, '').trim();
+            let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]?\s*(?:Actual\s*\/\s*ATR|Serial\s*\/\s*ATR|Actual|Serial|ATR)\s*:\s*\d{2,20}.*$/i, '').replace(/[:\-]\s*\d{2,20}.*$/, '').trim();
+            baseDesc = baseDesc.replace(/[:\-]+$/, '').trim();
             const scBarcode = (obs.barcode || '').trim();
             const scAtr = (obs.atr_serial || '').trim();
             if (scBarcode && scAtr && scBarcode === scAtr) {
-              observationContent = `${baseDesc} - Serial / ATR: ${scBarcode}`;
+              observationContent = `${baseDesc} - Actual / ATR: ${scBarcode}`;
             } else if (scBarcode && scAtr) {
-              observationContent = `${baseDesc} - Serial: ${scBarcode} (ATR: ${scAtr})`;
+              observationContent = `${baseDesc} - Actual: ${scBarcode} (ATR: ${scAtr})`;
             } else if (scBarcode) {
-              observationContent = `${baseDesc} - Serial: ${scBarcode}`;
+              observationContent = `${baseDesc} - Actual: ${scBarcode}`;
             } else if (scAtr) {
               observationContent = `${baseDesc} - ATR: ${scAtr}`;
             }
@@ -437,7 +450,7 @@
             case 'Accepted with Deviation':
             case 'Accepted with deviation':
               statusColor = 'green';
-              closedPoints++;
+              closedSet.add(String(obs.S_no).trim());
               break;
             case 'Not Available':
             case 'Not Present':
@@ -493,7 +506,8 @@
         });
       });
       table.appendChild(tbody);
-      const openPoints = totalPoints - closedPoints;
+      const closedPoints = closedSet.size;
+      const openPoints = Math.max(0, totalPoints - closedPoints);
       const summaryTable = document.createElement("table");
       summaryTable.innerHTML = `
         <thead>
@@ -522,8 +536,20 @@
         console.error('Expected an array of observations, but got:', observations);
         return {};
       }
+      // Deduplicate by S_no so PDF generation never renders duplicate checkpoints
+      const uniqueMap = new Map();
+      observations.forEach(obs => {
+        if (obs && obs.S_no) {
+          const snoKey = String(obs.S_no).trim();
+          if (!uniqueMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+            uniqueMap.set(snoKey, obs);
+          }
+        }
+      });
+      const uniqueObservations = Array.from(uniqueMap.values());
+
       const grouped = {};
-      observations.forEach(observation => {
+      uniqueObservations.forEach(observation => {
         const section = observation.S_no && typeof observation.S_no === 'string' && observation.S_no.includes('.') ? observation.S_no.split('.')[0] : null;
         if (!section) {
           console.warn(`Invalid S_no: ${observation.S_no}`);
@@ -626,9 +652,19 @@
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
-        const observationsArray = observationsData.data.filter(obs =>
+        const rawObs = (observationsData.data || []).filter(obs =>
           obs.observation_status && obs.observation_status.trim() !== '' && obs.observation_status.trim() !== 'Select'
         );
+        const pdfUniqueMap = new Map();
+        rawObs.forEach(obs => {
+          if (obs && obs.S_no) {
+            const snoKey = String(obs.S_no).trim();
+            if (!pdfUniqueMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+              pdfUniqueMap.set(snoKey, obs);
+            }
+          }
+        });
+        const observationsArray = Array.from(pdfUniqueMap.values());
 
         const imagePromises = observationsArray.map(async (obs) => {
           const imageList = [];
@@ -752,7 +788,7 @@
 
         const totalPointsFixed = 183;
         const closedPoints = closedSet.size;
-        const openPoints = totalPointsFixed - closedPoints;
+        const openPoints = Math.max(0, totalPointsFixed - closedPoints);
 
 
 
@@ -1054,16 +1090,16 @@
 
             const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
             if (isSection2) {
-              let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]\s*\d{10,15}.*$/, '').trim();
-              baseDesc = baseDesc.replace(/:+$/, '').trim();
+              let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]?\s*(?:Actual\s*\/\s*ATR|Serial\s*\/\s*ATR|Actual|Serial|ATR)\s*:\s*\d{2,20}.*$/i, '').replace(/[:\-]\s*\d{2,20}.*$/, '').trim();
+              baseDesc = baseDesc.replace(/[:\-]+$/, '').trim();
               const scBarcode = (obs.barcode || '').trim();
               const scAtr = (obs.atr_serial || '').trim();
               if (scBarcode && scAtr && scBarcode === scAtr) {
-                observationContent = `${baseDesc} - Serial / ATR: ${scBarcode}`;
+                observationContent = `${baseDesc} - Actual / ATR: ${scBarcode}`;
               } else if (scBarcode && scAtr) {
-                observationContent = `${baseDesc} - Serial: ${scBarcode} (ATR: ${scAtr})`;
+                observationContent = `${baseDesc} - Actual: ${scBarcode} (ATR: ${scAtr})`;
               } else if (scBarcode) {
-                observationContent = `${baseDesc} - Serial: ${scBarcode}`;
+                observationContent = `${baseDesc} - Actual: ${scBarcode}`;
               } else if (scAtr) {
                 observationContent = `${baseDesc} - ATR: ${scAtr}`;
               }

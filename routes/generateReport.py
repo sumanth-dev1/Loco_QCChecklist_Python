@@ -176,7 +176,7 @@ def generateReport():
             for obs in tbl_obs:
                 if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
                     if not obs.get('barcode') and obs.get('observation_text'):
-                        m = re.search(r'[:\-]?\s*(\d{10,15})\b', str(obs['observation_text']))
+                        m = re.search(r'[:\-]\s*(\d{2,20})\b', str(obs['observation_text'])) or re.search(r'\b(\d{10,15})\b', str(obs['observation_text']))
                         if m:
                             obs['barcode'] = m.group(1)
                     if not obs.get('atr_serial') and obs.get('barcode'):
@@ -196,6 +196,23 @@ def generateReport():
 
                 obs['images'] = valid_images
                 observations.append(obs)
+
+        # Deduplicate observations by S_no to guarantee no section or checkpoint repeats
+        dedup_observations = {}
+        for obs in observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        observations = list(dedup_observations.values())
 
         return jsonify({
             'success': True,

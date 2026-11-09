@@ -8,9 +8,16 @@ if sys.stderr is None:
 
 from waitress import serve
 from app import app
+from routes.part_details import ensure_master_db
 from database.setup_database import setup_or_migrate
 
 if __name__ == "__main__":
+    try:
+        # Guarantee offline equipment master SQLite is ready before server starts
+        ensure_master_db()
+    except Exception as e:
+        print(f"Equipment master initialization notice: {e}")
+
     try:
         # Automatically ensures loco_info is preserved and hhp_loco_info is created with all tables
         setup_or_migrate()

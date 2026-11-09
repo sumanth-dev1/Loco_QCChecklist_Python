@@ -105,7 +105,7 @@ def generateHhpReport():
 
                 row_barcode = row.get('barcode')
                 if not row_barcode and obs_text:
-                    m = re.search(r'[:\-]?\s*(\d{10,15})\b', str(obs_text))
+                    m = re.search(r'[:\-]\s*(\d{2,20})\b', str(obs_text)) or re.search(r'\b(\d{10,15})\b', str(obs_text))
                     if m:
                         row_barcode = m.group(1)
                 row_atr = row.get('atr_serial') or row_barcode
@@ -124,6 +124,23 @@ def generateHhpReport():
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None,
                     'section_id': row.get('section_id')
                 })
+
+        # Deduplicate observations by S_no to guarantee no section or checkpoint repeats
+        dedup_observations = {}
+        for obs in all_observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        all_observations = list(dedup_observations.values())
 
         return jsonify({
             'success': True,

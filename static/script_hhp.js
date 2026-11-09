@@ -755,13 +755,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
     oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "/>
@@ -822,12 +822,12 @@ async function showSection(section) {
       type="text" 
       id="kavach-main-unit" 
       name="barcode_kavach_main_unit" 
-      pattern="^\d{10,15}$" 
-      title="Enter a number between 10 to 15 digits" 
+      pattern="^[A-Za-z0-9_-]{2,20}$" 
+      title="Enter a valid part number (2 to 20 digits/characters)" 
       placeholder="Scan Barcode" 
       style="width:180px; padding:5px; font-size:14px;" 
       oninput="
-        if (this.value.length > 15) this.value = this.value.slice(-15);
+        if (this.value.length > 20) this.value = this.value.slice(-20);
         toggleNotInstalledOption(this);
       "
     >
@@ -887,13 +887,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -948,13 +948,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1011,13 +1011,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1074,13 +1074,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1137,13 +1137,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1200,13 +1200,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1264,13 +1264,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1326,13 +1326,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1391,13 +1391,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1454,13 +1454,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1519,13 +1519,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1580,13 +1580,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1642,13 +1642,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1703,13 +1703,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
     oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1765,13 +1765,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1827,13 +1827,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1889,13 +1889,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -1951,13 +1951,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2012,13 +2012,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2073,13 +2073,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2134,13 +2134,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2195,13 +2195,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2256,13 +2256,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2317,13 +2317,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2379,13 +2379,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2441,13 +2441,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2503,13 +2503,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2565,13 +2565,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2627,13 +2627,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2690,13 +2690,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2752,13 +2752,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2814,13 +2814,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2876,13 +2876,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -2939,13 +2939,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -3001,13 +3001,13 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
@@ -8877,7 +8877,7 @@ function updateObservationsTable(sectionID, observations, sno) {
         let rowBarcode = (observation.barcode || "").trim();
     let rowAtr = (observation.atr_serial || "").trim();
     if (!rowBarcode && observation.observation_text) {
-      const match = observation.observation_text.match(/[:\-]?\s*(\d{10,15})\b/);
+      const match = observation.observation_text.match(/[:\-]\s*([A-Za-z0-9_-]{2,20})\b/) || observation.observation_text.match(/\b(\d{10,15})\b/);
       if (match) rowBarcode = match[1];
     }
     if (!rowAtr && rowBarcode) rowAtr = rowBarcode;
@@ -8889,20 +8889,20 @@ function updateObservationsTable(sectionID, observations, sno) {
           type="text"
           id="barcode-input-${rowId}"
           name="barcode_kavach_main_unit"
-          pattern="^\\d{10,15}$"
-          title="Enter a number between 10 to 15 digits"
+          pattern="^[A-Za-z0-9_-]{2,20}$"
+          title="Enter a valid part number (2 to 20 digits/characters)"
           placeholder="Scan Barcode"
           style="width: 180px; padding: 5px; font-size: 14px;"
           value="${rowBarcode}"
           data-initial-value="${rowBarcode}"
 oninput="
   // Keep only digits
-  let cleaned = this.value.replace(/\D/g, '');
-  if (cleaned.length > 15) cleaned = cleaned.slice(-15);
+  let cleaned = this.value.replace(/[^A-Za-z0-9_-]/g, '');
+  if (cleaned.length > 20) cleaned = cleaned.slice(-20);
   this.value = cleaned;
 
-  // Only update if barcode is between 10 and 15 digits
-  if (cleaned.length >= 10 && cleaned.length <= 15) {
+  // Only update if barcode is between 2 and 20 characters
+  if (cleaned.length >= 2 && cleaned.length <= 20) {
     updateEditedBarcode('${rowId}', cleaned);
   } else {
     delete window.editedBarcodes['${rowId}'];
@@ -8946,8 +8946,19 @@ oninput="
         atrCellContent = `<td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>`;
       } else {
         let matchedStatusHtml = "";
-        if (rowAtr && (observation.observation_status === "Matching" || observation.observation_status === "Manual")) {
-          matchedStatusHtml = `<span style="color: ${observation.observation_status === 'Matching' ? '#27ae60' : '#e67e22'}; font-weight: bold;">✔ Matched (${rowAtr})</span>`;
+        const obsStatus = (observation.observation_status || "").trim();
+        if (obsStatus === "Matching") {
+          matchedStatusHtml = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Manual") {
+          matchedStatusHtml = `<span style="color: #e67e22; font-weight: bold;">✖ Manual Verification ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Not Matching") {
+          matchedStatusHtml = `<span style="color: #dc3545; font-weight: bold;">✖ Not Matching ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Not Installed") {
+          matchedStatusHtml = `<span style="color: #6c757d; font-weight: bold;">— Not Installed</span>`;
+        } else if (obsStatus === "Not Applicable") {
+          matchedStatusHtml = `<span style="color: #6c757d; font-weight: bold;">— Not Applicable</span>`;
+        } else if (rowBarcode || rowAtr) {
+          matchedStatusHtml = `<span style="color: #007bff; font-weight: 500;">Click 'Fetch' to verify</span>`;
         }
         atrCellContent = `
           <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">

@@ -59,6 +59,23 @@ def fetch_observations():
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None
                 })
 
+        # Deduplicate observations by S_no to guarantee no section repeats
+        dedup_observations = {}
+        for obs in observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        observations = list(dedup_observations.values())
+
         if observations:
             return jsonify({'status': 'success', 'data': observations})
         else:

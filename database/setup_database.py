@@ -26,16 +26,25 @@ import config
 def ensure_equipment_master_db():
     """Extracts the offline equipment master SQLite DB from .gz if missing."""
     import gzip
+    import shutil
     db_path = os.path.join(BASE_DIR, "database", "equipment_master.db")
     gz_path = db_path + ".gz"
-    if not os.path.exists(db_path) and os.path.exists(gz_path):
+    if (not os.path.exists(db_path) or os.path.getsize(db_path) < 1000000) and os.path.exists(gz_path):
         print("  --> Extracting offline equipment master database for remote station inspections...")
+        tmp_path = db_path + ".tmp"
         try:
-            with gzip.open(gz_path, "rb") as f_in, open(db_path, "wb") as f_out:
-                f_out.writelines(f_in)
+            with gzip.open(gz_path, "rb") as f_in, open(tmp_path, "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out, length=1024 * 1024)
+            if os.path.exists(tmp_path) and os.path.getsize(tmp_path) > 1000000:
+                os.replace(tmp_path, db_path)
             print("  --> Offline equipment master ready.")
         except Exception as e:
             print(f"  [Notice] Master extraction note: {e}")
+            if os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except Exception:
+                    pass
 
 
 def get_mysql_server_connection():

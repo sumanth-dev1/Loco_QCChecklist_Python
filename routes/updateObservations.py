@@ -124,7 +124,7 @@ def updateObservations():
                     else:
                         status = re.sub(r'\s*\(Height:.*?\)', '', status, flags=re.IGNORECASE)
                 else:
-                    m = re.match(r'^(.*):\s*(\d{10,15})$', existing_text)
+                    m = re.match(r'^(.*):\s*(\d{2,20})$', existing_text)
                     if m:
                         existing_description = m.group(1).strip()
                         existing_barcode = m.group(2).strip()
