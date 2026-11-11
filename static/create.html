@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic QA Form</title>
   <link rel="stylesheet" type="text/css" href="style.css">
-  <script src = "script.js?v=4.9" defer></script>
+  <script src = "script.js?v=5.0" defer></script>
    <!-- 3rd‑party libraries (all local) -->
   <script src="libs/jquery-3.6.0.min.js"></script>
   <script src="libs/zxing-browser.min.js"></script>
@@ -72,14 +72,20 @@
   <script>
     function getStandardShedName(shedName) {
       if (!shedName) return "";
-      const lowerShed = shedName.toLowerCase();
+      const trimmedShed = String(shedName).trim();
+      const lowerShed = trimmedShed.toLowerCase();
       if (lowerShed.includes("vadodara") || lowerShed.includes("vadodhara")) {
         return "Vadodara Loco Shed(BRC)";
       }
       if (lowerShed.includes("vatva")) {
         return "Vatva Loco Shed(VTA)";
       }
-      return shedName;
+      if (lowerShed === "lallaguda") return "Lallaguda";
+      if (lowerShed === "moula ali" || lowerShed === "moulaali") return "Moula Ali";
+      if (lowerShed === "guntakal") return "Guntakal";
+      if (lowerShed === "kazipet") return "Kazipet";
+      if (lowerShed === "vijayawada") return "Vijayawada";
+      return trimmedShed;
     }
 
     window.addEventListener('load', function() {
@@ -100,12 +106,13 @@
                 document.getElementById("loco-id").value = details.locoID || "";
                 document.getElementById("loco-type").value = details.locoType || "";
                 document.getElementById("brake-type").value = details.brakeType || "";
-                document.getElementById("railway-division").value = details.railwayDivision || "";
+                document.getElementById("railway-division").value = (details.railwayDivision || "").trim();
                 
+                const stdShedName = getStandardShedName(details.shedName || "");
                 if (typeof window.updateShedNames === 'function') {
-                  window.updateShedNames();
+                  window.updateShedNames(stdShedName);
                 }
-                document.getElementById("shed-name").value = getStandardShedName(details.shedName || "");
+                document.getElementById("shed-name").value = stdShedName;
                 document.getElementById("date").value = details.inspectionDate || "";
 
                 // Automatically trigger getDetails() to load observations & highlight sidebar
@@ -142,12 +149,13 @@
             if (document.getElementById("loco-id")) document.getElementById("loco-id").value = normalized.locoID;
             if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
             if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
-            if (document.getElementById("railway-division")) document.getElementById("railway-division").value = normalized.railwayDivision;
+            if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (normalized.railwayDivision || "").trim();
             
+            const stdShedName = getStandardShedName(normalized.shedName);
             if (typeof window.updateShedNames === 'function') {
-              window.updateShedNames();
+              window.updateShedNames(stdShedName);
             }
-            if (document.getElementById("shed-name")) document.getElementById("shed-name").value = getStandardShedName(normalized.shedName);
+            if (document.getElementById("shed-name")) document.getElementById("shed-name").value = stdShedName;
             if (document.getElementById("date")) document.getElementById("date").value = normalized.inspectionDate;
           });
         } else {
@@ -166,6 +174,9 @@
               const element = document.getElementById(id);
               if (element) element.value = "";
             });
+            if (typeof window.updateShedNames === 'function') {
+              window.updateShedNames();
+            }
           });
         }
       }
@@ -251,9 +262,13 @@ window.addEventListener("beforeunload", beforeUnloadHandler);
                 const brakeTypeElem = document.getElementById("brake-type");
                 if (brakeTypeElem) brakeTypeElem.value = locoInfo.brakeType || "";
                 const divisionElem = document.getElementById("railway-division");
-                if (divisionElem) divisionElem.value = locoInfo.railwayDivision || "";
+                if (divisionElem) divisionElem.value = (locoInfo.railwayDivision || "").trim();
+                const stdShed = getStandardShedName(locoInfo.shedName || "");
+                if (typeof window.updateShedNames === 'function') {
+                  window.updateShedNames(stdShed);
+                }
                 const shedElem = document.getElementById("shed-name");
-                if (shedElem) shedElem.value = locoInfo.shedName || "";
+                if (shedElem) shedElem.value = stdShed;
               }
             } else {
               console.error("Error fetching report details:", data.message);

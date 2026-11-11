@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic QA Form - HHP LOCO</title>
   <link rel="stylesheet" type="text/css" href="style.css">
-  <script src="script_hhp.js?v=2.9" defer></script>
+  <script src="script_hhp.js?v=3.0" defer></script>
   <!-- 3rd‑party libraries (all local) -->
   <script src="libs/jquery-3.6.0.min.js"></script>
   <script src="libs/zxing-browser.min.js"></script>
@@ -80,14 +80,20 @@
   <script>
     function getStandardShedName(shedName) {
       if (!shedName) return "";
-      const lowerShed = shedName.toLowerCase();
+      const trimmedShed = String(shedName).trim();
+      const lowerShed = trimmedShed.toLowerCase();
       if (lowerShed.includes("vadodara") || lowerShed.includes("vadodhara")) {
         return "Vadodara Loco Shed(BRC)";
       }
       if (lowerShed.includes("vatva")) {
         return "Vatva Loco Shed(VTA)";
       }
-      return shedName;
+      if (lowerShed === "lallaguda") return "Lallaguda";
+      if (lowerShed === "moula ali" || lowerShed === "moulaali") return "Moula Ali";
+      if (lowerShed === "guntakal") return "Guntakal";
+      if (lowerShed === "kazipet") return "Kazipet";
+      if (lowerShed === "vijayawada") return "Vijayawada";
+      return trimmedShed;
     }
 
     window.addEventListener('load', function() {
@@ -107,9 +113,10 @@
                 if (document.getElementById("loco-id")) document.getElementById("loco-id").value = details.locoID || "";
                 if (document.getElementById("loco-type")) document.getElementById("loco-type").value = details.locoType || "";
                 if (document.getElementById("brake-type")) document.getElementById("brake-type").value = details.brakeType || "";
-                if (document.getElementById("railway-division")) document.getElementById("railway-division").value = details.railwayDivision || "";
-                if (typeof window.updateShedNames === 'function') window.updateShedNames();
-                if (document.getElementById("shed-name")) document.getElementById("shed-name").value = getStandardShedName(details.shedName || "");
+                if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (details.railwayDivision || "").trim();
+                const stdShedName = getStandardShedName(details.shedName || "");
+                if (typeof window.updateShedNames === 'function') window.updateShedNames(stdShedName);
+                if (document.getElementById("shed-name")) document.getElementById("shed-name").value = stdShedName;
                 if (document.getElementById("date")) document.getElementById("date").value = details.inspectionDate || "";
 
                 getDetails();
@@ -144,9 +151,10 @@
             if (document.getElementById("loco-id")) document.getElementById("loco-id").value = normalized.locoID;
             if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
             if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
-            if (document.getElementById("railway-division")) document.getElementById("railway-division").value = normalized.railwayDivision;
-            if (typeof window.updateShedNames === 'function') window.updateShedNames();
-            if (document.getElementById("shed-name")) document.getElementById("shed-name").value = getStandardShedName(normalized.shedName);
+            if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (normalized.railwayDivision || "").trim();
+            const stdShedName = getStandardShedName(normalized.shedName);
+            if (typeof window.updateShedNames === 'function') window.updateShedNames(stdShedName);
+            if (document.getElementById("shed-name")) document.getElementById("shed-name").value = stdShedName;
             if (document.getElementById("date")) document.getElementById("date").value = normalized.inspectionDate;
           });
         } else {
@@ -164,6 +172,9 @@
               const element = document.getElementById(id);
               if (element) element.value = "";
             });
+            if (typeof window.updateShedNames === 'function') {
+              window.updateShedNames();
+            }
             const dateElem = document.getElementById("date");
             if (dateElem) {
               const now = new Date();

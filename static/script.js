@@ -163,6 +163,16 @@ async function showSection(section) {
     };
   }
 
+  // Preserve current on-screen division/shed if already selected when switching sections
+  const liveDivision = document.getElementById("railway-division")?.value;
+  const liveShed = document.getElementById("shed-name")?.value;
+  if (liveDivision) {
+    locoInfo.railwayDivision = liveDivision;
+    locoInfo.shedName = liveShed || "";
+  } else if (liveShed && !locoInfo.shedName) {
+    locoInfo.shedName = liveShed;
+  }
+
 
 
 
@@ -348,6 +358,10 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>SCOR</option>
+                  <option value="SCR"  ${locoInfo && locoInfo.railwayDivision === "SCR"
+      ? "selected"
+      : ""
+    }>SCR</option>
                 </select>
             </td>
             
@@ -526,6 +540,28 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>New Katni Junction - Electric</option>
+
+                <!-- For SCR Division -->
+                <option value="Lallaguda" data-division="SCR" ${locoInfo && locoInfo.shedName === "Lallaguda"
+      ? "selected"
+      : ""
+    }>Lallaguda</option>
+                <option value="Moula Ali" data-division="SCR" ${locoInfo && locoInfo.shedName === "Moula Ali"
+      ? "selected"
+      : ""
+    }>Moula Ali</option>
+                <option value="Guntakal" data-division="SCR" ${locoInfo && locoInfo.shedName === "Guntakal"
+      ? "selected"
+      : ""
+    }>Guntakal</option>
+                <option value="Kazipet" data-division="SCR" ${locoInfo && locoInfo.shedName === "Kazipet"
+      ? "selected"
+      : ""
+    }>Kazipet</option>
+                <option value="Vijayawada" data-division="SCR" ${locoInfo && locoInfo.shedName === "Vijayawada"
+      ? "selected"
+      : ""
+    }>Vijayawada</option>
               </select>
             </td>
                         
@@ -8124,6 +8160,30 @@ Is other end of the Chain/Sling securely fastened to RFID reader by using bolt p
       </div>
     ;`
   }
+
+  // Synchronize division & shed dropdowns AFTER all mainContent.innerHTML += appends complete
+  const renderedDivisionSelect = document.getElementById("railway-division");
+  if (renderedDivisionSelect && locoInfo && locoInfo.railwayDivision) {
+    const targetDiv = String(locoInfo.railwayDivision).trim();
+    const matchingDivOpt = Array.from(renderedDivisionSelect.options).find(
+      opt => opt.value.trim().toLowerCase() === targetDiv.toLowerCase()
+    );
+    if (matchingDivOpt) {
+      Array.from(renderedDivisionSelect.options).forEach(opt => {
+        opt.selected = (opt === matchingDivOpt);
+        if (opt === matchingDivOpt) {
+          opt.setAttribute("selected", "selected");
+        } else {
+          opt.removeAttribute("selected");
+        }
+      });
+      renderedDivisionSelect.value = matchingDivOpt.value;
+    }
+  }
+  if (typeof window.updateShedNames === "function") {
+    const targetShed = locoInfo && locoInfo.shedName ? locoInfo.shedName : undefined;
+    window.updateShedNames(targetShed);
+  }
 }
 
 // Function to handle the logout
@@ -8133,46 +8193,107 @@ function logout() {
 
 // Event listener for dynamic shed name update
 
+window._masterShedOptions = window._masterShedOptions || [];
+
+function captureMasterShedOptions(shedSelect) {
+  if (!shedSelect) return;
+  const optionNodes = Array.from(shedSelect.querySelectorAll("option[data-division]"));
+  optionNodes.forEach(opt => {
+    const division = (opt.getAttribute("data-division") || "").trim();
+    const value = opt.value;
+    const text = (opt.textContent || "").trim();
+    if (!division || !value) return;
+    const alreadyExists = window._masterShedOptions.some(
+      item => item.division === division && item.value === value
+    );
+    if (!alreadyExists) {
+      window._masterShedOptions.push({ value, text, division });
+    }
+  });
+}
+
+// Always query live DOM elements so section re-renders never leave stale references
+window.updateShedNames = function (preferredShed) {
+  const divisionSelect = document.getElementById("railway-division");
+  const shedSelect = document.getElementById("shed-name");
+  if (!divisionSelect || !shedSelect) return;
+
+  captureMasterShedOptions(shedSelect);
+
+  const selectedDivision = (divisionSelect.value || "").trim();
+  const rawTargetShed = preferredShed !== undefined ? preferredShed : shedSelect.value;
+  const trimmedTarget = (rawTargetShed || "").trim();
+  const stdTarget = typeof getStandardShedName === "function"
+    ? getStandardShedName(trimmedTarget)
+    : trimmedTarget;
+  const targetLower = trimmedTarget.toLowerCase();
+  const stdTargetLower = (stdTarget || "").trim().toLowerCase();
+
+  // Reset to a single 'Select' placeholder
+  shedSelect.innerHTML = '<option value="" disabled selected>Select</option>';
+  const placeholderOpt = shedSelect.options[0];
+
+  let matchedValue = "";
+  window._masterShedOptions.forEach(item => {
+    if (item.division.toLowerCase() === selectedDivision.toLowerCase()) {
+      const opt = document.createElement("option");
+      opt.value = item.value;
+      opt.textContent = item.text;
+      opt.setAttribute("data-division", item.division);
+
+      if (!matchedValue && (trimmedTarget || stdTarget)) {
+        const itemValLower = item.value.trim().toLowerCase();
+        if (
+          item.value === trimmedTarget ||
+          item.value === stdTarget ||
+          itemValLower === targetLower ||
+          (stdTargetLower && itemValLower === stdTargetLower)
+        ) {
+          opt.selected = true;
+          opt.setAttribute("selected", "selected");
+          matchedValue = item.value;
+        }
+      }
+      shedSelect.appendChild(opt);
+    }
+  });
+
+  // Disable shed dropdown when no valid division is selected
+  if (!selectedDivision) {
+    shedSelect.disabled = true;
+    shedSelect.setAttribute("disabled", "disabled");
+  } else {
+    shedSelect.disabled = false;
+    shedSelect.removeAttribute("disabled");
+  }
+
+  if (matchedValue) {
+    if (placeholderOpt) {
+      placeholderOpt.selected = false;
+      placeholderOpt.removeAttribute("selected");
+    }
+    shedSelect.value = matchedValue;
+  } else {
+    if (placeholderOpt) {
+      placeholderOpt.selected = true;
+      placeholderOpt.setAttribute("selected", "selected");
+    }
+    shedSelect.value = "";
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   function initShedLogic() {
-    // Attempt to get the newly loaded or dynamically injected selects
     const divisionSelect = document.getElementById("railway-division");
     const shedSelect = document.getElementById("shed-name");
 
     // If they don't exist yet (because the form is injected later), re-check soon
     if (!divisionSelect || !shedSelect) {
-
       setTimeout(initShedLogic, 100);
       return;
     }
 
-    // Now that we have them, gather the <option data-division="...">
-    const allShedOptions = Array.from(
-      shedSelect.querySelectorAll("option[data-division]")
-    );
-
-    // Expose a global function so inline onchange="updateShedNames()" works
-    window.updateShedNames = function () {
-      if (!divisionSelect || !shedSelect) return;
-
-      const selectedDivision = divisionSelect.value;
-
-
-      // Reset to a single 'Select' placeholder
-      shedSelect.innerHTML = '<option value="" disabled selected>Select</option>';
-
-      // Inject only those options whose data-division matches
-      allShedOptions.forEach(option => {
-        if (option.getAttribute("data-division") === selectedDivision) {
-          shedSelect.appendChild(option.cloneNode(true));
-        }
-      });
-
-      // Optionally disable if no valid division
-      shedSelect.disabled = !selectedDivision;
-    };
-
-    // If a division is already selected (e.g. from session), update immediately
+    // Filter shed options while preserving any valid selection
     window.updateShedNames();
   }
 
