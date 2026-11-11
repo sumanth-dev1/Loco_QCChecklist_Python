@@ -314,6 +314,8 @@ async function showSection(section) {
     }>CCB 1.5</option>
                    <option value="CCB 2" ${locoInfo && locoInfo.brakeType === "CCB 2" ? "selected" : ""
     }>CCB 2</option>
+                   <option value="WSF" ${locoInfo && locoInfo.brakeType === "WSF" ? "selected" : ""
+    }>WSF</option>
                </select>
              </td>
              <td>
