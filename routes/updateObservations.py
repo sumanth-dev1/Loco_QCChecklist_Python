@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import json, re
 from flask import Blueprint, request, jsonify
 from db import get_connection
+from routes.upload import sanitize_and_save_image_path
 
 updateObservations_bp = Blueprint('updateObservations', __name__)
 
@@ -175,11 +176,14 @@ def updateObservations():
                     del_stmt.execute("DELETE FROM images WHERE loco_id = %s AND s_no = %s", (loco_id, s_no))
                     del_stmt.close()
 
-                    for img_path in image_paths:
+                    for raw_img_path in image_paths:
+                        clean_img_path = sanitize_and_save_image_path(raw_img_path)
+                        if not clean_img_path:
+                            continue
                         img_stmt = conn.cursor()
                         img_stmt.execute(
                             "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())",
-                            ('radio_power', loco_id, s_no, img_path)
+                            ('radio_power', loco_id, s_no, clean_img_path)
                         )
                         img_stmt.close()
             else:
@@ -221,11 +225,14 @@ def updateObservations():
                 debug_entry['finalHeight'] = new_height
 
                 if image_paths and isinstance(image_paths, list):
-                    for img_path in image_paths:
+                    for raw_img_path in image_paths:
+                        clean_img_path = sanitize_and_save_image_path(raw_img_path)
+                        if not clean_img_path:
+                            continue
                         img_stmt = conn.cursor()
                         img_stmt.execute(
                             "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())",
-                            ('radio_power', loco_id, s_no, img_path)
+                            ('radio_power', loco_id, s_no, clean_img_path)
                         )
                         img_stmt.close()
 

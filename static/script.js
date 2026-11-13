@@ -9543,13 +9543,23 @@ async function updateObservation(section) {
     if (observationText || remarks || barcodeValue || heightValue) hasChanges = true;
     if (!observationStatus && !remarks && !barcodeValue && !heightValue && !observationText) continue;
 
-    // 5b) Gather ALL images currently in the container
+    // 5b) Gather ALL images currently in the container (only actual server paths)
     const existingPaths = [];
+    const pendingDataImgs = [];
     const imgContainer = document.getElementById(`image-container-${rowId}`);
     if (imgContainer) {
       imgContainer.querySelectorAll("img").forEach(img => {
-        const rel = img.src.replace(/^.*\/uploads\//, "uploads/");
-        existingPaths.push(rel);
+        const src = img.getAttribute("src") || img.src || "";
+        if (src.startsWith("data:") || src.startsWith("blob:")) {
+          pendingDataImgs.push(src);
+          return;
+        }
+        if (src.includes("/uploads/") || src.startsWith("uploads/")) {
+          const rel = src.replace(/^.*\/uploads\//, "uploads/");
+          if (!existingPaths.includes(rel)) {
+            existingPaths.push(rel);
+          }
+        }
       });
     }
 
@@ -9558,7 +9568,20 @@ async function updateObservation(section) {
 
     // 5d) Upload new Files/Blobs from rowFiles map
     let uploadedPaths = [];
-    const newFiles = rowFiles.get(rowId) || [];
+    let newFiles = (rowFiles.get(rowId) || []).filter(f => f instanceof File || f instanceof Blob);
+    // If preview images exist in container that are not yet in rowFiles, convert them to files for upload
+    if (newFiles.length === 0 && pendingDataImgs.length > 0) {
+      for (let i = 0; i < pendingDataImgs.length; i++) {
+        try {
+          const bRes = await fetch(pendingDataImgs[i]);
+          const bBlob = await bRes.blob();
+          newFiles.push(new File([bBlob], `image_${rowId}_${i}.png`, { type: bBlob.type || "image/png" }));
+        } catch (e) {
+          console.warn("Could not convert preview to blob:", e);
+        }
+      }
+    }
+
     if (newFiles.length) {
       try {
         uploadedPaths = await uploadImages(newFiles);
@@ -9569,10 +9592,10 @@ async function updateObservation(section) {
       }
     }
 
-    // 5e) Consolidate final image list
+    // 5e) Consolidate final image list (guaranteed clean server paths)
     const allImages = [
       ...existingPaths.filter(p => !deletedPaths.includes(p)),
-      ...uploadedPaths
+      ...uploadedPaths.filter(p => p && !p.startsWith("data:") && !p.startsWith("blob:"))
     ];
 
     const rowPayload = {
@@ -9931,14 +9954,9 @@ function uploadCapturedImage(blob, rowId, imageContainer) {
       if (data.success && data.file_paths && data.file_paths.length > 0) {
         const imageUrl = data.file_paths[0];
 
-        // Add the captured image URL to the image container and rowFiles map
+        // Add the captured image URL to the image container
         addImageWithDeleteIcon(imageUrl, imageContainer, rowId); // Use reusable function
         updateObservations(rowId, imageUrl);
-
-        // Add captured image URL to rowFiles (if it's not already in there)
-        const files = rowFiles.get(rowId) || [];
-        files.push(imageUrl);  // Add imageUrl from captured image
-        rowFiles.set(rowId, files);
 
         console.log(`✅ Image uploaded: ${imageUrl}`);
       } else {
@@ -9959,19 +9977,21 @@ async function uploadDeviceImages(rowId) {
   if (imageContainer) {
     const imgs = imageContainer.querySelectorAll("img");
     for (const img of imgs) {
-      const src = img.getAttribute("src");
-      if (src.startsWith("data:image")) {
-        // Optional: convert base64 to blob + upload here if needed
-        console.warn("Base64 image detected. Already uploaded via camera.");
-      } else {
+      const src = img.getAttribute("src") || img.src || "";
+      if (src.startsWith("data:") || src.startsWith("blob:")) {
+        continue;
+      }
+      if (src.includes("/uploads/") || src.startsWith("uploads/")) {
         const relative = src.replace(/^.*\/uploads\//, "uploads/");
-        imagePaths.push(relative);
+        if (!imagePaths.includes(relative)) {
+          imagePaths.push(relative);
+        }
       }
     }
   }
 
   // Then upload files from rowFiles map (device uploads)
-  const files = rowFiles.get(rowId) || [];
+  const files = (rowFiles.get(rowId) || []).filter(f => f instanceof File || f instanceof Blob);
   if (files.length > 0) {
     const fd = new FormData();
     files.forEach(f => fd.append("images[]", f));
@@ -9984,8 +10004,11 @@ async function uploadDeviceImages(rowId) {
       const data = await response.json();
       if (data.success && data.file_paths) {
         data.file_paths.forEach(path => {
-          imagePaths.push(path);
+          if (!imagePaths.includes(path)) {
+            imagePaths.push(path);
+          }
         });
+        rowFiles.set(rowId, []); // clear queue after successful upload
       } else {
         alert("❌ Upload failed.");
         return [];

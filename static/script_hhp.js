@@ -9812,15 +9812,17 @@ async function uploadDeviceImages(rowId) {
     if (imageContainer) {
       const imgs = imageContainer.querySelectorAll("img");
       for (const img of imgs) {
-        const src = img.getAttribute("src");
-        if (src && !src.startsWith("data:image")) {
+        const src = img.getAttribute("src") || img.src || "";
+        if (src && !src.startsWith("data:") && !src.startsWith("blob:") && (src.includes("/uploads/") || src.startsWith("uploads/"))) {
           const relative = src.replace(/^.*\/uploads\//, "uploads/");
-          imagePaths.push(relative);
+          if (!imagePaths.includes(relative)) {
+            imagePaths.push(relative);
+          }
         }
       }
     }
 
-    const files = (typeof rowFiles !== 'undefined' && rowFiles && rowFiles.get) ? (rowFiles.get(rowId) || []) : [];
+    const files = ((typeof rowFiles !== 'undefined' && rowFiles && rowFiles.get) ? (rowFiles.get(rowId) || []) : []).filter(f => f instanceof File || f instanceof Blob);
     if (files.length > 0) {
       const fd = new FormData();
       files.forEach(f => fd.append("images[]", f));
@@ -9832,8 +9834,13 @@ async function uploadDeviceImages(rowId) {
       const data = await response.json();
       if (data.success && data.file_paths) {
         data.file_paths.forEach(path => {
-          imagePaths.push(path);
+          if (!imagePaths.includes(path)) {
+            imagePaths.push(path);
+          }
         });
+        if (typeof rowFiles !== 'undefined' && rowFiles && rowFiles.set) {
+          rowFiles.set(rowId, []);
+        }
       }
     }
   } catch (err) {

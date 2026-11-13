@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import json, re
 from flask import Blueprint, request, jsonify
 from db import get_hhp_connection
+from routes.upload import sanitize_and_save_image_path
 
 updateHhpObservations_bp = Blueprint('updateHhpObservations', __name__)
 
@@ -153,7 +154,9 @@ def updateHhpObservations():
                     cursor.execute(del_img, (loco_id, s_no))
                     ins_img = "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())"
                     for img_p in image_paths:
-                        cursor.execute(ins_img, ('hhp_section', loco_id, s_no, img_p))
+                        clean_p = sanitize_and_save_image_path(img_p)
+                        if clean_p:
+                            cursor.execute(ins_img, ('hhp_section', loco_id, s_no, clean_p))
 
             else:
                 # Insert
@@ -197,7 +200,9 @@ def updateHhpObservations():
                 if isinstance(image_paths, list) and image_paths:
                     ins_img = "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())"
                     for img_p in image_paths:
-                        cursor.execute(ins_img, ('hhp_section', loco_id, s_no, img_p))
+                        clean_p = sanitize_and_save_image_path(img_p)
+                        if clean_p:
+                            cursor.execute(ins_img, ('hhp_section', loco_id, s_no, clean_p))
 
             debug_info.append(debug_entry)
 

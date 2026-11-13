@@ -123,8 +123,28 @@ def migrate_loco_id_columns(cursor, db_name):
     except Exception:
         pass
 
-    if migrated_count > 0:
-        print(f"    [Upgrade] Upgraded {migrated_count} tables to VARCHAR(50) loco_id (leading-zero support enabled).")
+def migrate_image_path_columns(cursor, db_name):
+    """
+    Safely upgrades all image_path columns across all checklist tables to TEXT
+    WITHOUT dropping any data or losing any observations.
+    Permanently prevents MySQL error 1406 (Data too long for column 'image_path').
+    """
+    cursor.execute(f"""
+        SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_SCHEMA = '{db_name}' AND COLUMN_NAME IN ('image_path', 'image_paths')
+    """)
+    rows = cursor.fetchall()
+    migrated = 0
+    for table_name, col_name, data_type in rows:
+        if data_type.lower() in ('varchar', 'char'):
+            try:
+                cursor.execute(f"ALTER TABLE `{db_name}`.`{table_name}` MODIFY COLUMN `{col_name}` TEXT NULL")
+                migrated += 1
+            except Exception as e:
+                print(f"    [Warning] Could not alter {table_name}.{col_name}: {e}")
+    if migrated > 0:
+        print(f"    [Upgrade] Upgraded {migrated} image_path columns to TEXT in {db_name}.")
 
 
 def setup_or_migrate():
@@ -155,6 +175,7 @@ def setup_or_migrate():
             
             # Non-destructive safety upgrades
             migrate_loco_id_columns(cursor, "loco_info")
+            migrate_image_path_columns(cursor, "loco_info")
             
             # Ensure optional columns exist in verify_serial_numbers_of_equipment_as_per_ic
             try:
@@ -167,6 +188,10 @@ def setup_or_migrate():
                 pass
             try:
                 cursor.execute("ALTER TABLE `loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `loco_info`.`images` MODIFY COLUMN `image_path` TEXT NOT NULL")
             except Exception:
                 pass
             print("  --> 'loco_info' is fully verified and ready.\n")
@@ -192,6 +217,7 @@ def setup_or_migrate():
             print(f"[PRESERVED] Found existing 'hhp_loco_info' database ({hhp_table_count} tables).")
             print("  --> ZERO DATA LOSS: Existing HHP tables and records are 100% UNTOUCHED.")
             migrate_loco_id_columns(cursor, "hhp_loco_info")
+            migrate_image_path_columns(cursor, "hhp_loco_info")
             try:
                 cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `barcode` VARCHAR(255) NULL")
             except Exception:
@@ -202,6 +228,10 @@ def setup_or_migrate():
                 pass
             try:
                 cursor.execute("ALTER TABLE `hhp_loco_info`.`verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+            except Exception:
+                pass
+            try:
+                cursor.execute("ALTER TABLE `hhp_loco_info`.`images` MODIFY COLUMN `image_path` TEXT NOT NULL")
             except Exception:
                 pass
             print("  --> 'hhp_loco_info' is fully verified and ready.\n")
