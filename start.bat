@@ -54,7 +54,7 @@ if %ERRORLEVEL% neq 0 (
 
 echo [*] Installing dependencies from requirements.txt ...
 "%~dp0venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
-"%~dp0venv\Scripts\pip.exe" install -r "%~dp0requirements.txt"
+"%~dp0venv\Scripts\python.exe" -m pip install -r "%~dp0requirements.txt"
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] Failed to install dependencies.
     pause
