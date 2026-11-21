@@ -111,7 +111,7 @@ def updateObservations():
 
                 if table_name == 'loco_antenna_and_gps_gsm_antenna' and s_no in ['8.1', '8.2', '8.3', '8.4', '8.5', '8.6']:
                     updated_description = updated_description.replace('≤', '<=').replace('&lt;=', '<=')
-                    updated_description = re.sub(r'(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$', r'', updated_description, flags=re.IGNORECASE)
+                    updated_description = re.sub(r'(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$', r'\\1', updated_description, flags=re.IGNORECASE)
                     if updated_description != '' and not updated_description.endswith('.'):
                         updated_description += '.'
 

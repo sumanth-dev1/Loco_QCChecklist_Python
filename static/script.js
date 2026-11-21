@@ -9051,6 +9051,14 @@ function updateObservationsTable(sectionID, observations, sno) {
         observation.observation_status = statusText.replace(/\s*\(Height:.*?\)/i, '').trim();
       }
 
+      if (!observationContent.toLowerCase().includes("height shall be") && defaultTexts[S_no]) {
+        if (!heightValue) {
+          const mNum = observationContent.match(/\b(\d{2,4})\b/);
+          if (mNum) heightValue = mNum[1];
+        }
+        observationContent = defaultTexts[S_no];
+      }
+
       const match = observationContent.match(/^(.*height shall be\s*(?:<=|≤|&lt;=)\s*\d+(?:mm)?\.?)\s*(?:-?\s*)?(\d+)(?:\s*\.\s*\d+)*$/i);
       if (match) {
         observationContent = match[1].replace(/&lt;=/g, '<=').replace('≤', '<=');
@@ -9528,6 +9536,8 @@ async function updateObservation(section) {
         heightValue = hInput.value.trim();
         if (hInput.dataset.initialValue !== heightValue) hasChanges = true;
         observationText = observationText.replace(/&lt;=/g, '<=').replace(/≤/g, '<=');
+        observationText = observationText.replace(/(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$/i, '$1');
+        observationText = observationText.replace(/(\s*\.\s*\d+)+$/, '');
         if (heightValue !== "") {
           if (observationText !== '' && !observationText.endsWith('.')) {
             observationText += '.';

@@ -8975,6 +8975,14 @@ function updateObservationsTable(sectionID, observations, sno) {
         observation.observation_status = statusText.replace(/\s*\(Height:.*?\)/i, '').trim();
       }
 
+      if (!observationContent.toLowerCase().includes("height shall be") && defaultTexts[S_no]) {
+        if (!heightValue) {
+          const mNum = observationContent.match(/\b(\d{2,4})\b/);
+          if (mNum) heightValue = mNum[1];
+        }
+        observationContent = defaultTexts[S_no];
+      }
+
       const match = observationContent.match(/^(.*height shall be\s*(?:<=|≤|&lt;=)\s*\d+(?:mm)?\.?)\s*(?:-?\s*)?(\d+)(?:\s*\.\s*\d+)*$/i);
       if (match) {
         observationContent = match[1].replace(/&lt;=/g, '<=').replace('≤', '<=');
@@ -9450,6 +9458,8 @@ async function updateObservation(section) {
     let text = descriptionHtml.trim();
     if ((formattedSection === "8_0" || section === "8_0" || section === "8.0") && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no) && heightValue !== "") {
       text = text.replace(/&lt;=/g, "<=").replace(/≤/g, "<=");
+      text = text.replace(/(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$/i, '$1');
+      text = text.replace(/(\s*\.\s*\d+)+$/, '');
       if (!text.endsWith(".")) text += ".";
       text = text + " " + heightValue;
     }
