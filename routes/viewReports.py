@@ -332,15 +332,26 @@ VIEW_REPORTS_HTML = """<!DOCTYPE html>
         }
 
         select.innerHTML = '<option value="" disabled selected>Select an Activity Assignment</option>';
+        let autoSelectedId = null;
         matchingActs.forEach(act => {
             const opt = document.createElement('option');
             opt.value = act._id;
             opt.text = `Loco #${act.loco.number} - ${act.name}`;
+            const cleanActLoco = String(act.loco.number).replace(/^0+/, '');
+            const cleanCurLoco = String(currentLocoId || '').replace(/^0+/, '');
+            if (cleanActLoco && cleanCurLoco && cleanActLoco === cleanCurLoco && !autoSelectedId) {
+                opt.selected = true;
+                autoSelectedId = act._id;
+            }
             select.appendChild(opt);
         });
 
         selectGroup.style.display = 'block';
         statusText.innerHTML = "Choose a locomotive activity assignment from the dropdown below:";
+
+        if (autoSelectedId) {
+            onLocoSelected();
+        }
     } catch (e) {
         statusText.innerHTML = `<span style="color:red;">Connection error during verification: ${e.message}</span>`;
     }
@@ -376,9 +387,17 @@ VIEW_REPORTS_HTML = """<!DOCTYPE html>
         const activityDetails = detailsResult.data;
         const qcFiles = activityDetails.qcFiles || [];
         
-        const targetDoc = qcFiles.find(doc => 
-            doc.name && doc.name.toLowerCase().includes("in-process qc checklist for loco kavach installation")
+        let targetDoc = qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("in-process qc checklist")
+        ) || qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("qc checklist")
+        ) || qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("checklist")
         );
+
+        if (!targetDoc && qcFiles.length > 0) {
+            targetDoc = qcFiles[0];
+        }
 
         if (!targetDoc) {
             detailsDiv.innerHTML = `<span style="color:red;">Configuration Error: Could not find document slot matching <b>"In-Process QC Checklist for Loco Kavach Installation"</b> in this activity.</span>`;

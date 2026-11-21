@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import html
+import html, re
 from flask import Blueprint, request, jsonify
 from db import get_hhp_connection
 
@@ -53,9 +53,21 @@ def generateHhpReport():
         host = request.host
         protocol = "https://" if request.is_secure else "http://"
 
+        try:
+            cursor.execute("ALTER TABLE `verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+        except Exception:
+            pass
+
+        try:
+            cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+        except Exception:
+            has_atr_col = False
+        atr_col_expr = ", atr_serial" if has_atr_col else ", NULL as atr_serial"
+
         all_observations = []
         for tbl in TABLE_NAMES:
-            barcode_select = ", barcode" if tbl == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode"
+            barcode_select = f", barcode {atr_col_expr}" if tbl == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode, NULL as atr_serial"
             sql = f"""SELECT S_no, observation_text, observation_status, remarks, image_path, created_at, updated_at, section_id {barcode_select} 
                       FROM `{tbl}` WHERE loco_id = %s
                       ORDER BY
@@ -85,19 +97,50 @@ def generateHhpReport():
                     else:
                         valid_web_images.append(clean_p)
 
+                obs_text = row['observation_text']
+                if obs_text:
+                    obs_text = html.unescape(obs_text)
+                    if '&lt;' in obs_text:
+                        obs_text = html.unescape(obs_text)
+
+                row_barcode = row.get('barcode')
+                if not row_barcode and obs_text:
+                    m = re.search(r'[:\-]\s*(\d{2,20})\b', str(obs_text)) or re.search(r'\b(\d{10,15})\b', str(obs_text))
+                    if m:
+                        row_barcode = m.group(1)
+                row_atr = row.get('atr_serial') or row_barcode
+
                 all_observations.append({
                     'S_no': row['S_no'],
-                    'observation_text': row['observation_text'],
+                    'observation_text': obs_text,
                     'observation_status': row['observation_status'],
                     'remarks': row['remarks'],
                     'image_path': ','.join(img_paths) if img_paths else (row['image_path'] or ''),
                     'image_paths': img_paths,
                     'images': valid_web_images,
-                    'barcode': row.get('barcode'),
+                    'barcode': row_barcode,
+                    'atr_serial': row_atr,
                     'created_at': str(row['created_at']) if row.get('created_at') else None,
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None,
                     'section_id': row.get('section_id')
                 })
+
+        # Deduplicate observations by S_no to guarantee no section or checkpoint repeats
+        dedup_observations = {}
+        for obs in all_observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        all_observations = list(dedup_observations.values())
 
         return jsonify({
             'success': True,

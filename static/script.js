@@ -104,6 +104,7 @@ async function showSection(section) {
     newActiveBtn.classList.add("active");
   }
 
+
   // 4) Finally, do the rest of your code that actually loads the new section's content
   if (section !== "0.0") {
 
@@ -160,6 +161,16 @@ async function showSection(section) {
       shedName: "",
       inspectionDate: ""
     };
+  }
+
+  // Preserve current on-screen division/shed if already selected when switching sections
+  const liveDivision = document.getElementById("railway-division")?.value;
+  const liveShed = document.getElementById("shed-name")?.value;
+  if (liveDivision) {
+    locoInfo.railwayDivision = liveDivision;
+    locoInfo.shedName = liveShed || "";
+  } else if (liveShed && !locoInfo.shedName) {
+    locoInfo.shedName = liveShed;
   }
 
 
@@ -272,6 +283,7 @@ async function showSection(section) {
       <option value="WDS-6" ${locoInfo && locoInfo.locoType === "WDS-6" ? "selected" : ""}>WDS-6</option>
        <option value="EF-9K" ${locoInfo && locoInfo.locoType === "EF-9K" ? "selected" : ""}>EF-9K</option>
        <option value="EF-12K" ${locoInfo && locoInfo.locoType === "EF-12K" ? "selected" : ""}>EF-12K</option>
+       <option value="D-9" ${locoInfo && locoInfo.locoType === "D-9" ? "selected" : ""}>D-9</option>
     
                 </select>
                 </div>
@@ -292,6 +304,8 @@ async function showSection(section) {
     }>RCCB</option>
                   <option value="ESCORT" ${locoInfo && locoInfo.brakeType === "ESCORT" ? "selected" : ""
     }>ESCORT</option>
+                  <option value="WSF" ${locoInfo && locoInfo.brakeType === "WSF" ? "selected" : ""
+    }>WSF</option>
                </select>
              </td>
              <td>
@@ -342,6 +356,14 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>SR</option>
+                  <option value="SCOR"  ${locoInfo && locoInfo.railwayDivision === "SCOR"
+      ? "selected"
+      : ""
+    }>SCOR</option>
+                  <option value="SCR"  ${locoInfo && locoInfo.railwayDivision === "SCR"
+      ? "selected"
+      : ""
+    }>SCR</option>
                 </select>
             </td>
             
@@ -373,7 +395,7 @@ async function showSection(section) {
 <option value="jamalpur(JMPD)" data-division="ER" ${locoInfo && locoInfo.shedName === "jamalpur(JMPD)" ? "selected" : ""}>jamalpur(JMPD)</option>
 <option value="Barddhaman(BWNX)" data-division="ER" ${locoInfo && locoInfo.shedName === "Barddhaman(BWNX)" ? "selected" : ""}>Barddhaman(BWNX)</option>
 <option value="CLW-Dankuni" data-division="ER" ${locoInfo && locoInfo.shedName === "CLW-Dankuni" ? "selected" : ""}>CLW-Dankuni</option>
-<option value="SSE/DLS-Andal(UDL)" data-division="ER" ${locoInfo && locoInfo.shedName === "SSE/DLS-Andal(UDL)" ? "selected" : ""}>SSE/DLS-Andal(UDL)</option>
+<option value="Andal" data-division="ER" ${locoInfo && locoInfo.shedName === "Andal" ? "selected" : ""}>Andal</option>
 <option value="Chittaranjan-CLW" data-division="ER" ${locoInfo && locoInfo.shedName === "Chittaranjan-CLW" ? "selected" : ""}>Chittaranjan-CLW</option>
 <option value="Ranaghat" data-division="ER" ${locoInfo && locoInfo.shedName === "Ranaghat" ? "selected" : ""}>Ranaghat</option>
 <option value="Narkeldanga EMU" data-division="ER" ${locoInfo && locoInfo.shedName === "Narkeldanga EMU" ? "selected" : ""}>Narkeldanga EMU</option>
@@ -384,12 +406,17 @@ async function showSection(section) {
                <!-- For WR Division -->
               <option value="Vadodara Loco Shed(BRC)" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Vadodara Loco Shed(BRC)" || locoInfo.shedName.toLowerCase().includes("vadodara") || locoInfo.shedName.toLowerCase().includes("vadodhara")) ? "selected" : ""}>Vadodara Loco Shed(BRC)</option>
               <option value="Vatva Loco Shed(VTA)" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Vatva Loco Shed(VTA)" || locoInfo.shedName.toLowerCase().includes("vatva")) ? "selected" : ""}>Vatva Loco Shed(VTA)</option>
+              <option value="Dahod" data-division="WR" ${locoInfo && locoInfo.shedName && (locoInfo.shedName === "Dahod" || locoInfo.shedName.toLowerCase().includes("dahod")) ? "selected" : ""}>Dahod</option>
                 
               <!-- For NFR Division -->
                 <option value="Malda(MLDD)" data-division="NFR" ${locoInfo && locoInfo.shedName === "Malda(MLDD)"
       ? "selected"
       : ""
     }>Malda(MLDD)</option>
+                <option value="Siliguri" data-division="NFR" ${locoInfo && locoInfo.shedName === "Siliguri"
+      ? "selected"
+      : ""
+    }>Siliguri</option>
 
                 <!-- For SER Division -->
                 <option value="Tatanagar(TATE)" data-division="SER" ${locoInfo && locoInfo.shedName === "Tatanagar(TATE)"
@@ -418,10 +445,6 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Patratu(PTRX)</option>
-                <option value="Vishakapatnam" data-division="ECR" ${locoInfo && locoInfo.shedName === "Vishakapatnam"
-      ? "selected"
-      : ""
-    }>Vishakapatnam</option>
                 <option value="GAYA" data-division="ECR" ${locoInfo && locoInfo.shedName === "GAYA"
       ? "selected"
       : ""
@@ -444,10 +467,14 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Patiala(PLW)</option>
-                <option value="Tuglakabad(TKD-D)" data-division="NR" ${locoInfo && locoInfo.shedName === "Tuglakabad(TKD-D)"
+                <option value="Tuglakabad(TKD-D)" data-division="NR" ${locoInfo && (locoInfo.shedName === "Tuglakabad(TKD-D)" || locoInfo.shedName === "Tughlakabad")
       ? "selected"
       : ""
     }>Tuglakabad(TKD-D)</option>
+                <option value="Tughlakabad" data-division="NR" ${locoInfo && (locoInfo.shedName === "Tughlakabad" || locoInfo.shedName === "Tuglakabad(TKD-D)")
+      ? "selected"
+      : ""
+    }>Tughlakabad</option>
                 <option value="Kapurthala(RCF)" data-division="NR" ${locoInfo && locoInfo.shedName === "Kapurthala(RCF)"
       ? "selected"
       : ""
@@ -473,10 +500,10 @@ async function showSection(section) {
     }>Kanpur</option>
 
                   <!-- For SWR Division -->
-                <option value="KR Puram Loco Shed" data-division="SWR" ${locoInfo && locoInfo.shedName === "KR Puram Loco Shed"
+                <option value="Krishnarajapuram" data-division="SWR" ${locoInfo && locoInfo.shedName === "Krishnarajapuram"
       ? "selected"
       : ""
-    }>KR Puram Loco Shed</option>
+    }>Krishnarajapuram</option>
                  <option value="Hubli" data-division="SWR" ${locoInfo && locoInfo.shedName === "Hubli"
       ? "selected"
       : ""
@@ -487,7 +514,16 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>Arakkonam</option>
-                 
+                <option value="Tiruchirappalli" data-division="SR" ${locoInfo && locoInfo.shedName === "Tiruchirappalli"
+      ? "selected"
+      : ""
+    }>Tiruchirappalli</option>
+
+                <!-- For SCOR Division -->
+                <option value="Visakhapatnam" data-division="SCOR" ${locoInfo && locoInfo.shedName === "Visakhapatnam"
+      ? "selected"
+      : ""
+    }>Visakhapatnam</option>
 
                 <!-- For WCR Division -->
                 <option value="Itarsi(ETE)" data-division="WCR" ${locoInfo && locoInfo.shedName === "Itarsi(ETE)"
@@ -506,6 +542,28 @@ async function showSection(section) {
       ? "selected"
       : ""
     }>New Katni Junction - Electric</option>
+
+                <!-- For SCR Division -->
+                <option value="Lallaguda" data-division="SCR" ${locoInfo && locoInfo.shedName === "Lallaguda"
+      ? "selected"
+      : ""
+    }>Lallaguda</option>
+                <option value="Moula Ali" data-division="SCR" ${locoInfo && locoInfo.shedName === "Moula Ali"
+      ? "selected"
+      : ""
+    }>Moula Ali</option>
+                <option value="Guntakal" data-division="SCR" ${locoInfo && locoInfo.shedName === "Guntakal"
+      ? "selected"
+      : ""
+    }>Guntakal</option>
+                <option value="Kazipet" data-division="SCR" ${locoInfo && locoInfo.shedName === "Kazipet"
+      ? "selected"
+      : ""
+    }>Kazipet</option>
+                <option value="Vijayawada" data-division="SCR" ${locoInfo && locoInfo.shedName === "Vijayawada"
+      ? "selected"
+      : ""
+    }>Vijayawada</option>
               </select>
             </td>
                         
@@ -665,6 +723,7 @@ async function showSection(section) {
           <tr>
             <th>S_No</th>
             <th>Description</th>
+            <th>ATR</th>
             <th>Observation</th>
             <th>Remarks/Comments</th>
             <th>Image</th>
@@ -674,6 +733,7 @@ async function showSection(section) {
         <tr id="row-4">
         <td>2.1</td>
       <td class="observation_text">Ensure presence of Hologram and S/R Stamp on each equipment</td>
+      <td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>
       <td>
         <select id="status-dropdown" onchange="highlightSelect(this)">
            <option value="Select">Select</option>
@@ -713,16 +773,28 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
     oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   
 
@@ -732,6 +804,7 @@ async function showSection(section) {
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -767,21 +840,34 @@ async function showSection(section) {
       type="text" 
       id="kavach-main-unit" 
       name="barcode_kavach_main_unit" 
-      pattern="^\d{10,15}$" 
-      title="Enter a number between 10 to 15 digits" 
+      pattern="^[A-Za-z0-9_-]{2,20}$" 
+      title="Enter a valid part number (2 to 20 digits/characters)" 
       placeholder="Scan Barcode" 
       style="width:180px; padding:5px; font-size:14px;" 
       oninput="
-        if (this.value.length > 15) this.value = this.value.slice(-15);
+        if (this.value.length > 20) this.value = this.value.slice(-20);
         toggleNotInstalledOption(this);
       "
     >
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
    <td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -819,22 +905,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-  <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)" style="width: 180px; padding: 5px; font-size: 14px; margin-bottom: 10px;">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -867,24 +966,36 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-  
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)" style="width: 180px; padding: 5px; font-size: 14px; margin-bottom: 10px;">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -918,17 +1029,29 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   
   <td class="select">
@@ -936,6 +1059,7 @@ async function showSection(section) {
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -968,23 +1092,36 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1018,23 +1155,36 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1068,24 +1218,36 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-  
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
   </td>
   <td class="select">
     <select id="status-dropdown" onchange="highlightSelect(this)">
       <option value="Select">Select</option>
       <option value="Matching">Matching</option>
       <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
       <option value="Not Installed">Not Installed</option>
     </select>
   </td>
@@ -1120,24 +1282,36 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-           
-          </td>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
             <td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1170,18 +1344,30 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
-/> 
-          </td>
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
 
         
             <td class="select">
@@ -1189,6 +1375,7 @@ async function showSection(section) {
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1222,23 +1409,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
-/>  
-
-            <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1273,25 +1472,38 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
   </div>
-</td>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td>
 
             <td class="select">
              <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1325,22 +1537,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
    oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1373,22 +1598,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1422,22 +1660,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1470,22 +1721,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
     oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1519,22 +1783,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1568,22 +1845,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1617,22 +1907,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1666,22 +1969,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1714,22 +2030,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1762,22 +2091,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1810,22 +2152,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1858,22 +2213,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1906,22 +2274,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -1954,22 +2335,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2003,22 +2397,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2052,22 +2459,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2101,22 +2521,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2150,22 +2583,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2199,22 +2645,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2249,22 +2708,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2298,22 +2770,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2347,22 +2832,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2396,22 +2894,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2446,22 +2957,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
               </select>
             </td>
@@ -2496,22 +3020,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
 />
-            <td class="select">
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -2547,21 +3084,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
-/> <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -2596,21 +3147,35 @@ async function showSection(section) {
   type="text" 
   id="kavach-main-unit" 
   name="barcode_kavach_main_unit" 
-  pattern="^\d{10,15}$" 
-  title="Enter a number between 10 to 15 digits" 
+  pattern="^[A-Za-z0-9_-]{2,20}$" 
+  title="Enter a valid part number (2 to 20 digits/characters)" 
   placeholder="Scan Barcode" 
   style="width: 180px; padding: 5px; font-size: 14px;" 
   oninput="
-    if(this.value.length > 15) {
-      this.value = this.value.slice(-15);
+    if(this.value.length > 20) {
+      this.value = this.value.slice(-20);
     }
     toggleNotInstalledOption(this);
   "
-/> <td class="select">
+/>
+  </td>
+  <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input 
+        type="text" 
+        class="atr-serial-input" 
+        placeholder="ATR Serial No" 
+        style="width: 140px; padding: 5px; font-size: 14px;" 
+        title="ATR Serial Number"
+      />
+    </div>
+    <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;"></div>
+  </td><td class="select">
               <select id="status-dropdown" onchange="highlightSelect(this)">
                 <option value="Select">Select</option>
                 <option value="Matching">Matching</option>
                 <option value="Not Matching">Not Matching</option>
+      <option value="Manual">Manual</option>
                 <option value="Not Installed">Not Installed</option>
                 <option value="Not Applicable">Not Applicable</option>
               </select>
@@ -2652,6 +3217,7 @@ async function showSection(section) {
               onclick="updateObservation('2_0')">
         Update
       </button>
+    <button type="button" id="fetch-unit-atr-btn-sec" onclick="fetchUnitAtr(this)" style="display: inline-block; padding: 10px 20px; font-size: 15px; font-weight: bold; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Fetch</button>
     <button type="button" id= "save-btn" style = "display: inline-block;" onclick="saveObservation('2_0')">Save</button>
      <button id="get-details-btn" onclick="getDetails()">Get Details</button>
 </div>`;
@@ -7596,6 +8162,30 @@ Is other end of the Chain/Sling securely fastened to RFID reader by using bolt p
       </div>
     ;`
   }
+
+  // Synchronize division & shed dropdowns AFTER all mainContent.innerHTML += appends complete
+  const renderedDivisionSelect = document.getElementById("railway-division");
+  if (renderedDivisionSelect && locoInfo && locoInfo.railwayDivision) {
+    const targetDiv = String(locoInfo.railwayDivision).trim();
+    const matchingDivOpt = Array.from(renderedDivisionSelect.options).find(
+      opt => opt.value.trim().toLowerCase() === targetDiv.toLowerCase()
+    );
+    if (matchingDivOpt) {
+      Array.from(renderedDivisionSelect.options).forEach(opt => {
+        opt.selected = (opt === matchingDivOpt);
+        if (opt === matchingDivOpt) {
+          opt.setAttribute("selected", "selected");
+        } else {
+          opt.removeAttribute("selected");
+        }
+      });
+      renderedDivisionSelect.value = matchingDivOpt.value;
+    }
+  }
+  if (typeof window.updateShedNames === "function") {
+    const targetShed = locoInfo && locoInfo.shedName ? locoInfo.shedName : undefined;
+    window.updateShedNames(targetShed);
+  }
 }
 
 // Function to handle the logout
@@ -7605,46 +8195,107 @@ function logout() {
 
 // Event listener for dynamic shed name update
 
+window._masterShedOptions = window._masterShedOptions || [];
+
+function captureMasterShedOptions(shedSelect) {
+  if (!shedSelect) return;
+  const optionNodes = Array.from(shedSelect.querySelectorAll("option[data-division]"));
+  optionNodes.forEach(opt => {
+    const division = (opt.getAttribute("data-division") || "").trim();
+    const value = opt.value;
+    const text = (opt.textContent || "").trim();
+    if (!division || !value) return;
+    const alreadyExists = window._masterShedOptions.some(
+      item => item.division === division && item.value === value
+    );
+    if (!alreadyExists) {
+      window._masterShedOptions.push({ value, text, division });
+    }
+  });
+}
+
+// Always query live DOM elements so section re-renders never leave stale references
+window.updateShedNames = function (preferredShed) {
+  const divisionSelect = document.getElementById("railway-division");
+  const shedSelect = document.getElementById("shed-name");
+  if (!divisionSelect || !shedSelect) return;
+
+  captureMasterShedOptions(shedSelect);
+
+  const selectedDivision = (divisionSelect.value || "").trim();
+  const rawTargetShed = preferredShed !== undefined ? preferredShed : shedSelect.value;
+  const trimmedTarget = (rawTargetShed || "").trim();
+  const stdTarget = typeof getStandardShedName === "function"
+    ? getStandardShedName(trimmedTarget)
+    : trimmedTarget;
+  const targetLower = trimmedTarget.toLowerCase();
+  const stdTargetLower = (stdTarget || "").trim().toLowerCase();
+
+  // Reset to a single 'Select' placeholder
+  shedSelect.innerHTML = '<option value="" disabled selected>Select</option>';
+  const placeholderOpt = shedSelect.options[0];
+
+  let matchedValue = "";
+  window._masterShedOptions.forEach(item => {
+    if (item.division.toLowerCase() === selectedDivision.toLowerCase()) {
+      const opt = document.createElement("option");
+      opt.value = item.value;
+      opt.textContent = item.text;
+      opt.setAttribute("data-division", item.division);
+
+      if (!matchedValue && (trimmedTarget || stdTarget)) {
+        const itemValLower = item.value.trim().toLowerCase();
+        if (
+          item.value === trimmedTarget ||
+          item.value === stdTarget ||
+          itemValLower === targetLower ||
+          (stdTargetLower && itemValLower === stdTargetLower)
+        ) {
+          opt.selected = true;
+          opt.setAttribute("selected", "selected");
+          matchedValue = item.value;
+        }
+      }
+      shedSelect.appendChild(opt);
+    }
+  });
+
+  // Disable shed dropdown when no valid division is selected
+  if (!selectedDivision) {
+    shedSelect.disabled = true;
+    shedSelect.setAttribute("disabled", "disabled");
+  } else {
+    shedSelect.disabled = false;
+    shedSelect.removeAttribute("disabled");
+  }
+
+  if (matchedValue) {
+    if (placeholderOpt) {
+      placeholderOpt.selected = false;
+      placeholderOpt.removeAttribute("selected");
+    }
+    shedSelect.value = matchedValue;
+  } else {
+    if (placeholderOpt) {
+      placeholderOpt.selected = true;
+      placeholderOpt.setAttribute("selected", "selected");
+    }
+    shedSelect.value = "";
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   function initShedLogic() {
-    // Attempt to get the newly loaded or dynamically injected selects
     const divisionSelect = document.getElementById("railway-division");
     const shedSelect = document.getElementById("shed-name");
 
     // If they don't exist yet (because the form is injected later), re-check soon
     if (!divisionSelect || !shedSelect) {
-
       setTimeout(initShedLogic, 100);
       return;
     }
 
-    // Now that we have them, gather the <option data-division="...">
-    const allShedOptions = Array.from(
-      shedSelect.querySelectorAll("option[data-division]")
-    );
-
-    // Expose a global function so inline onchange="updateShedNames()" works
-    window.updateShedNames = function () {
-      if (!divisionSelect || !shedSelect) return;
-
-      const selectedDivision = divisionSelect.value;
-
-
-      // Reset to a single 'Select' placeholder
-      shedSelect.innerHTML = '<option value="" disabled selected>Select</option>';
-
-      // Inject only those options whose data-division matches
-      allShedOptions.forEach(option => {
-        if (option.getAttribute("data-division") === selectedDivision) {
-          shedSelect.appendChild(option.cloneNode(true));
-        }
-      });
-
-      // Optionally disable if no valid division
-      shedSelect.disabled = !selectedDivision;
-    };
-
-    // If a division is already selected (e.g. from session), update immediately
+    // Filter shed options while preserving any valid selection
     window.updateShedNames();
   }
 
@@ -7715,7 +8366,11 @@ function highlightSelect(selectElement) {
   selectElement.style.color = ""; // default
 
   const value = selectElement.value;
-  if (
+  if (value === "Manual") {
+    selectElement.style.backgroundColor = "#ffc107";
+    selectElement.style.color = "#000";
+    return;
+  } else if (
     value === "Not Available" ||
     value === "No" ||
     value === "Not Connected" ||
@@ -8083,6 +8738,17 @@ async function saveObservation(section) {
       image_paths: imagePaths
     };
 
+    if (section === "2_0") {
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+      const bcVal = bcInput ? bcInput.value.trim().slice(-15) : "";
+      const atrInput = row.querySelector(".atr-serial-input");
+      const atrVal = atrInput ? atrInput.value.trim() : "";
+      const serialNum = bcVal || atrVal;
+      observationPayload.barcode = serialNum;
+      observationPayload.barcode_kavach_main_unit = serialNum;
+      observationPayload.atr_serial = atrVal || serialNum;
+    }
+
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       observationPayload.height = heightValue;
     }
@@ -8264,6 +8930,19 @@ function updateEditedBarcode(rowId, value) {
   window.editedBarcodes[rowId] = value;
 }
 
+
+function decodeHtmlEntities(str) {
+  if (!str) return "";
+  const txt = document.createElement("textarea");
+  txt.innerHTML = str;
+  let val = txt.value;
+  if (val.includes("&lt;") || val.includes("&gt;")) {
+    txt.innerHTML = val;
+    val = txt.value;
+  }
+  return val;
+}
+
 function updateObservationsTable(sectionID, observations, sno) {
   const tbody = document.getElementById(`observations-tbody-${sectionID}`);
   if (!tbody) {
@@ -8272,13 +8951,22 @@ function updateObservationsTable(sectionID, observations, sno) {
   }
 
   const defaultTexts = {};
+  const defaultOptionsMap = {};
   Array.from(tbody.querySelectorAll("tr")).forEach(tr => {
     const s_no_td = tr.querySelector("td:first-child");
     const text_td = tr.querySelector(".observation_text");
-    if (s_no_td && text_td) {
-      defaultTexts[s_no_td.innerText.trim()] = text_td.innerHTML;
+    const select = tr.querySelector("select");
+    if (s_no_td) {
+      const snoVal = s_no_td.innerText.trim();
+      if (text_td) defaultTexts[snoVal] = text_td.innerHTML;
+      if (select) {
+        defaultOptionsMap[snoVal] = Array.from(select.options)
+          .map(o => o.value)
+          .filter(v => v && v !== "Select");
+      }
     }
   });
+  window.currentDefaultOptionsMap = defaultOptionsMap;
 
   tbody.innerHTML = "";
 
@@ -8348,7 +9036,12 @@ function updateObservationsTable(sectionID, observations, sno) {
     `;
 
     // For the observation text cell, include the barcode input field only for section "2_0"
-    let observationContent = observation.observation_text || defaultTexts[S_no] || "N/A";
+    let baseText = decodeHtmlEntities(observation.observation_text) || defaultTexts[S_no] || "N/A";
+    baseText = decodeHtmlEntities(baseText);
+    if (sectionID === "2_0") {
+      baseText = baseText.replace(/<input[^>]*>/gi, '').replace(/<br\s*[\/]?>/gi, '').trim();
+    }
+    let observationContent = baseText;
     let heightValue = "";
     if (sectionID === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       let statusText = observation.observation_status || "";
@@ -8356,6 +9049,14 @@ function updateObservationsTable(sectionID, observations, sno) {
       if (heightMatch) {
         heightValue = heightMatch[1];
         observation.observation_status = statusText.replace(/\s*\(Height:.*?\)/i, '').trim();
+      }
+
+      if (!observationContent.toLowerCase().includes("height shall be") && defaultTexts[S_no]) {
+        if (!heightValue) {
+          const mNum = observationContent.match(/\b(\d{2,4})\b/);
+          if (mNum) heightValue = mNum[1];
+        }
+        observationContent = defaultTexts[S_no];
       }
 
       const match = observationContent.match(/^(.*height shall be\s*(?:<=|≤|&lt;=)\s*\d+(?:mm)?\.?)\s*(?:-?\s*)?(\d+)(?:\s*\.\s*\d+)*$/i);
@@ -8370,25 +9071,35 @@ function updateObservationsTable(sectionID, observations, sno) {
       }
       observationContent = observationContent.replace(/(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$/i, '$1');
     }
+        let rowBarcode = (observation.barcode || "").trim();
+    let rowAtr = (observation.atr_serial || "").trim();
+    if (!rowBarcode && observation.observation_text) {
+      const match = observation.observation_text.match(/[:\-]\s*([A-Za-z0-9_-]{2,20})\b/) || observation.observation_text.match(/\b(\d{10,15})\b/);
+      if (match) rowBarcode = match[1];
+    }
+    if (!rowAtr && rowBarcode) rowAtr = rowBarcode;
+    if (!rowBarcode && rowAtr) rowBarcode = rowAtr;
+
     if (sectionID === "2_0" && S_no !== "2.1") {
       observationContent += `<br>
         <input
           type="text"
           id="barcode-input-${rowId}"
           name="barcode_kavach_main_unit"
-          pattern="^\\d{10,15}$"
-          title="Enter a number between 10 to 15 digits"
+          pattern="^[A-Za-z0-9_-]{2,20}$"
+          title="Enter a valid part number (2 to 20 digits/characters)"
           placeholder="Scan Barcode"
           style="width: 180px; padding: 5px; font-size: 14px;"
-          value="${observation.barcode || ''}"
+          value="${rowBarcode}"
+          data-initial-value="${rowBarcode}"
 oninput="
   // Keep only digits
-  let cleaned = this.value.replace(/\D/g, '');
-  if (cleaned.length > 15) cleaned = cleaned.slice(-15);
+  let cleaned = this.value.replace(/[^A-Za-z0-9_-]/g, '');
+  if (cleaned.length > 20) cleaned = cleaned.slice(-20);
   this.value = cleaned;
 
-  // Only update if barcode is between 10 and 15 digits
-  if (cleaned.length >= 10 && cleaned.length <= 15) {
+  // Only update if barcode is between 2 and 20 characters
+  if (cleaned.length >= 2 && cleaned.length <= 20) {
     updateEditedBarcode('${rowId}', cleaned);
   } else {
     delete window.editedBarcodes['${rowId}'];
@@ -8426,9 +9137,50 @@ oninput="
       `;
     }
 
+    let atrCellContent = "";
+    if (sectionID === "2_0") {
+      if (S_no === "2.1") {
+        atrCellContent = `<td class="atr-cell" style="text-align: center; color: #888; padding: 5px;">-</td>`;
+      } else {
+        let matchedStatusHtml = "";
+        const obsStatus = (observation.observation_status || "").trim();
+        if (obsStatus === "Matching") {
+          matchedStatusHtml = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Manual") {
+          matchedStatusHtml = `<span style="color: #e67e22; font-weight: bold;">✖ Manual Verification ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Not Matching") {
+          matchedStatusHtml = `<span style="color: #dc3545; font-weight: bold;">✖ Not Matching ${rowAtr ? '(' + rowAtr + ')' : ''}</span>`;
+        } else if (obsStatus === "Not Installed") {
+          matchedStatusHtml = `<span style="color: #6c757d; font-weight: bold;">— Not Installed</span>`;
+        } else if (obsStatus === "Not Applicable") {
+          matchedStatusHtml = `<span style="color: #6c757d; font-weight: bold;">— Not Applicable</span>`;
+        } else if (rowBarcode || rowAtr) {
+          matchedStatusHtml = `<span style="color: #007bff; font-weight: 500;">Click 'Fetch' to verify</span>`;
+        }
+        atrCellContent = `
+          <td class="atr-cell" style="padding: 5px 10px; vertical-align: middle;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input 
+                type="text" 
+                class="atr-serial-input" 
+                id="atr-input-${rowId}"
+                placeholder="ATR Serial No" 
+                style="width: 140px; padding: 5px; font-size: 14px;" 
+                value="${rowAtr}"
+                data-initial-value="${rowAtr}"
+                oninput="if(typeof enableUpdateButton==='function') enableUpdateButton(); if(typeof markDataAsUnsaved==='function') markDataAsUnsaved();"
+              />
+            </div>
+            <div class="atr-status-msg" style="font-size: 11px; margin-top: 4px; min-height: 14px;">${matchedStatusHtml}</div>
+          </td>
+        `;
+      }
+    }
+
     row.innerHTML = `
       <td>${S_no}</td>
       <td class="observation_text">${observationContent}</td>
+      ${atrCellContent}
       <td>
         ${statusCellContent}
       </td>
@@ -8769,10 +9521,14 @@ async function updateObservation(section) {
     let heightValue = "";
 
     if (section === "2_0") {
-      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit']");
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
       if (bcInput) {
         barcodeValue = bcInput.value.trim().slice(-15);
         if (bcInput.dataset.initialValue !== barcodeValue) hasChanges = true;
+      }
+      const atrInput = row.querySelector(".atr-serial-input");
+      if (atrInput && atrInput.value.trim() !== (atrInput.dataset.initialValue || "")) {
+        hasChanges = true;
       }
     } else if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
       const hInput = row.querySelector(".height-input");
@@ -8780,6 +9536,8 @@ async function updateObservation(section) {
         heightValue = hInput.value.trim();
         if (hInput.dataset.initialValue !== heightValue) hasChanges = true;
         observationText = observationText.replace(/&lt;=/g, '<=').replace(/≤/g, '<=');
+        observationText = observationText.replace(/(height shall be\s*<=\s*\d+(?:mm)?\.?)[\s\.\d-]*$/i, '$1');
+        observationText = observationText.replace(/(\s*\.\s*\d+)+$/, '');
         if (heightValue !== "") {
           if (observationText !== '' && !observationText.endsWith('.')) {
             observationText += '.';
@@ -8795,13 +9553,23 @@ async function updateObservation(section) {
     if (observationText || remarks || barcodeValue || heightValue) hasChanges = true;
     if (!observationStatus && !remarks && !barcodeValue && !heightValue && !observationText) continue;
 
-    // 5b) Gather ALL images currently in the container
+    // 5b) Gather ALL images currently in the container (only actual server paths)
     const existingPaths = [];
+    const pendingDataImgs = [];
     const imgContainer = document.getElementById(`image-container-${rowId}`);
     if (imgContainer) {
       imgContainer.querySelectorAll("img").forEach(img => {
-        const rel = img.src.replace(/^.*\/uploads\//, "uploads/");
-        existingPaths.push(rel);
+        const src = img.getAttribute("src") || img.src || "";
+        if (src.startsWith("data:") || src.startsWith("blob:")) {
+          pendingDataImgs.push(src);
+          return;
+        }
+        if (src.includes("/uploads/") || src.startsWith("uploads/")) {
+          const rel = src.replace(/^.*\/uploads\//, "uploads/");
+          if (!existingPaths.includes(rel)) {
+            existingPaths.push(rel);
+          }
+        }
       });
     }
 
@@ -8810,7 +9578,20 @@ async function updateObservation(section) {
 
     // 5d) Upload new Files/Blobs from rowFiles map
     let uploadedPaths = [];
-    const newFiles = rowFiles.get(rowId) || [];
+    let newFiles = (rowFiles.get(rowId) || []).filter(f => f instanceof File || f instanceof Blob);
+    // If preview images exist in container that are not yet in rowFiles, convert them to files for upload
+    if (newFiles.length === 0 && pendingDataImgs.length > 0) {
+      for (let i = 0; i < pendingDataImgs.length; i++) {
+        try {
+          const bRes = await fetch(pendingDataImgs[i]);
+          const bBlob = await bRes.blob();
+          newFiles.push(new File([bBlob], `image_${rowId}_${i}.png`, { type: bBlob.type || "image/png" }));
+        } catch (e) {
+          console.warn("Could not convert preview to blob:", e);
+        }
+      }
+    }
+
     if (newFiles.length) {
       try {
         uploadedPaths = await uploadImages(newFiles);
@@ -8821,10 +9602,10 @@ async function updateObservation(section) {
       }
     }
 
-    // 5e) Consolidate final image list
+    // 5e) Consolidate final image list (guaranteed clean server paths)
     const allImages = [
       ...existingPaths.filter(p => !deletedPaths.includes(p)),
-      ...uploadedPaths
+      ...uploadedPaths.filter(p => p && !p.startsWith("data:") && !p.startsWith("blob:"))
     ];
 
     const rowPayload = {
@@ -8837,7 +9618,15 @@ async function updateObservation(section) {
     };
 
     if (section === "2_0") {
-      rowPayload.barcode = barcodeValue;
+      const bcInput = row.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+      const bcVal = bcInput ? bcInput.value.trim().slice(-15) : "";
+      const atrInput = row.querySelector(".atr-serial-input");
+      const atrVal = atrInput ? atrInput.value.trim() : "";
+      const serialNum = bcVal || atrVal || barcodeValue;
+      rowPayload.barcode = serialNum;
+      rowPayload.barcode_kavach_main_unit = serialNum;
+      rowPayload.atr_serial = atrVal || serialNum;
+      if (serialNum) hasChanges = true;
     }
 
     if (section === "8_0" && ["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(S_no)) {
@@ -8915,7 +9704,7 @@ function getDropdownOptions(sno, observationStatus) {
   }
   const specificOptions = {
     "2.1": ["Present", "Not Present"],
-    "2.38,2.39,2.40,2.3": ["Matching", "Not Matching", "Not Installed", "Not Applicable"], "2.2,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14,2.15,2.16,2.17,2.18,2.19,2.20,2.21,2.22,2.23,2.24,2.25,2.26,2.27,2.28,2.29,2.30,2.31,2.32,2.33,2.34,2.35,2.36,2.37": ["Matching", "Not Matching", "Not Installed"],
+    "2.38,2.39,2.40,2.3": ["Matching", "Not Matching", "Manual", "Not Installed", "Not Applicable"], "2.2,2.4,2.5,2.6,2.7,2.8,2.9,2.10,2.11,2.12,2.13,2.14,2.15,2.16,2.17,2.18,2.19,2.20,2.21,2.22,2.23,2.24,2.25,2.26,2.27,2.28,2.29,2.30,2.31,2.32,2.33,2.34,2.35,2.36,2.37": ["Matching", "Not Matching", "Manual", "Not Installed"],
     "3.6,14.13": ["Matching", "Not Matching"],
     "8.1,8.2,8.3,8.4,8.5,8.6": ["Yes", "No", "Accepted with Deviation", "No but accepted"],
     "3.3,3.4,3.5,3.5.1,3.5.2,3.12,3.13,6.2,6.4,6.7,7.2,9.1-9.6,14.2,14.6,15.2,15.4,15.10,15.5,15.5.1,3.12,3.13,5.7,6.10,6.11,5.1,14.8,5.2,5.3,9.7,5.8,5.7,15.9,8.7,8.8,8.9,8.10,8.13.1,8.13.2,8.13.3,8.13.4": ["Yes", "No"],
@@ -8966,6 +9755,13 @@ function getDropdownOptions(sno, observationStatus) {
         return defaultOption + "\n" + matchedOptions;
       }
     }
+  }
+
+  if (window.currentDefaultOptionsMap && window.currentDefaultOptionsMap[sno] && window.currentDefaultOptionsMap[sno].length > 0) {
+    const fallbackOptions = window.currentDefaultOptionsMap[sno].map(value =>
+      `<option value="${value}" ${observationStatus?.trim() === value ? "selected" : ""}>${value}</option>`
+    ).join("\n");
+    return defaultOption + "\n" + fallbackOptions;
   }
 
   return defaultOption;
@@ -9168,14 +9964,9 @@ function uploadCapturedImage(blob, rowId, imageContainer) {
       if (data.success && data.file_paths && data.file_paths.length > 0) {
         const imageUrl = data.file_paths[0];
 
-        // Add the captured image URL to the image container and rowFiles map
+        // Add the captured image URL to the image container
         addImageWithDeleteIcon(imageUrl, imageContainer, rowId); // Use reusable function
         updateObservations(rowId, imageUrl);
-
-        // Add captured image URL to rowFiles (if it's not already in there)
-        const files = rowFiles.get(rowId) || [];
-        files.push(imageUrl);  // Add imageUrl from captured image
-        rowFiles.set(rowId, files);
 
         console.log(`✅ Image uploaded: ${imageUrl}`);
       } else {
@@ -9196,19 +9987,21 @@ async function uploadDeviceImages(rowId) {
   if (imageContainer) {
     const imgs = imageContainer.querySelectorAll("img");
     for (const img of imgs) {
-      const src = img.getAttribute("src");
-      if (src.startsWith("data:image")) {
-        // Optional: convert base64 to blob + upload here if needed
-        console.warn("Base64 image detected. Already uploaded via camera.");
-      } else {
+      const src = img.getAttribute("src") || img.src || "";
+      if (src.startsWith("data:") || src.startsWith("blob:")) {
+        continue;
+      }
+      if (src.includes("/uploads/") || src.startsWith("uploads/")) {
         const relative = src.replace(/^.*\/uploads\//, "uploads/");
-        imagePaths.push(relative);
+        if (!imagePaths.includes(relative)) {
+          imagePaths.push(relative);
+        }
       }
     }
   }
 
   // Then upload files from rowFiles map (device uploads)
-  const files = rowFiles.get(rowId) || [];
+  const files = (rowFiles.get(rowId) || []).filter(f => f instanceof File || f instanceof Blob);
   if (files.length > 0) {
     const fd = new FormData();
     files.forEach(f => fd.append("images[]", f));
@@ -9221,8 +10014,11 @@ async function uploadDeviceImages(rowId) {
       const data = await response.json();
       if (data.success && data.file_paths) {
         data.file_paths.forEach(path => {
-          imagePaths.push(path);
+          if (!imagePaths.includes(path)) {
+            imagePaths.push(path);
+          }
         });
+        rowFiles.set(rowId, []); // clear queue after successful upload
       } else {
         alert("❌ Upload failed.");
         return [];
@@ -9592,6 +10388,9 @@ function highlightSelect(selectElement) {
     selectElement.style.backgroundColor = "red";
   } else if (selectElement.value === "No but accepted" || selectElement.value === "No But Accepted" || selectElement.value === "Accepted with Deviation") {
     selectElement.style.backgroundColor = "orange";
+  } else if (selectElement.value === "Manual") {
+    selectElement.style.backgroundColor = "#ffc107";
+    selectElement.style.color = "#000";
   } else {
     selectElement.style.backgroundColor = "";
   }
@@ -9748,4 +10547,278 @@ window.addEventListener('online', checkForUpdates);
 // Also check immediately when the page loads if already online
 if (navigator.onLine) {
   checkForUpdates();
+}
+
+
+// Function to fetch ATR details line by line from Configuration API
+async function fetchAtrSerial(btn) {
+  const tr = btn.closest("tr");
+  if (!tr) return;
+
+  const bcInput = tr.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+  const atrInput = tr.querySelector(".atr-serial-input");
+  const statusDiv = tr.querySelector(".atr-status-msg");
+  const selectEl = tr.querySelector("select");
+  const remarksEl = tr.querySelector(".remarks textarea");
+
+  const scannedValue = (bcInput ? bcInput.value : "").trim();
+  const atrValue = (atrInput ? atrInput.value : "").trim();
+  const partNoToQuery = scannedValue || atrValue;
+
+  if (!partNoToQuery) {
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: 600;">⚠️ Scan barcode or enter serial first</span>';
+    }
+    if (bcInput) bcInput.focus();
+    return;
+  }
+
+  const originalBtnText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "⏳...";
+  if (statusDiv) {
+    statusDiv.innerHTML = '<span style="color: #007bff;">Fetching ATR data...</span>';
+  }
+
+  try {
+    const response = await fetch(`/api/part-details?partNo=${encodeURIComponent(partNoToQuery)}`, {
+      cache: "no-store"
+    });
+    const result = await response.json();
+
+    if (response.ok && result && (result.status === true || (result.data && result.data.matched === true))) {
+      const data = result.data || {};
+      const fetchedSerial = (data.partNo ? String(data.partNo).trim() : partNoToQuery);
+      const partName = data.name || data.description || "";
+
+      if (atrInput) {
+        atrInput.value = fetchedSerial;
+        atrInput.style.backgroundColor = "#e8f8f5";
+        atrInput.style.borderColor = "#2ecc71";
+      }
+
+      // Check match:
+      // If scannedValue is present: check if it matches fetchedSerial (or API confirmed match)
+      // If no scannedValue was entered but atrValue was entered: it's matched
+      const isMatch = scannedValue 
+        ? (scannedValue.toLowerCase() === fetchedSerial.toLowerCase() || data.matched === true)
+        : (data.matched === true);
+
+      if (isMatch) {
+        if (selectEl) {
+          selectEl.value = "Matching";
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        if (statusDiv) {
+          statusDiv.innerHTML = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${partName ? '(' + partName + ')' : ''}</span>`;
+        }
+      } else {
+        if (selectEl) {
+          if ([...selectEl.options].some(o => o.value === "Manual")) {
+            selectEl.value = "Manual";
+          } else {
+            selectEl.value = "Not Matching";
+          }
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        if (statusDiv) {
+          statusDiv.innerHTML = '<span style="color: #e67e22; font-weight: bold;">✖ Mismatch &rarr; Set to Manual</span>';
+        }
+      }
+    } else {
+      // Part number not found / not matching
+      if (selectEl) {
+        if ([...selectEl.options].some(o => o.value === "Manual")) {
+          selectEl.value = "Manual";
+        } else {
+          selectEl.value = "Not Matching";
+        }
+        if (typeof highlightSelect === "function") highlightSelect(selectEl);
+      }
+      const errorMsg = (result && result.message) ? result.message : "Not Found";
+      if (statusDiv) {
+        statusDiv.innerHTML = `<span style="color: #e67e22; font-weight: bold;">✖ ${errorMsg} &rarr; Set to Manual</span>`;
+      }
+      if (remarksEl && !remarksEl.value.trim()) {
+        remarksEl.placeholder = "Manual verification remarks...";
+      }
+    }
+  } catch (err) {
+    console.error("Fetch ATR error:", err);
+    if (selectEl) {
+      if ([...selectEl.options].some(o => o.value === "Manual")) {
+        selectEl.value = "Manual";
+      } else {
+        selectEl.value = "Not Matching";
+      }
+      if (typeof highlightSelect === "function") highlightSelect(selectEl);
+    }
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #dc3545; font-weight: bold;">⚠️ Error connecting to server &rarr; Manual</span>';
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalBtnText;
+    if (typeof enableUpdateButton === "function") enableUpdateButton();
+    if (typeof markDataAsUnsaved === "function") markDataAsUnsaved();
+  }
+}
+
+
+// Function to fetch and verify ATR details for all equipment items in Section 2.0 at once
+async function fetchUnitAtr(callerBtn) {
+  const table = document.querySelector("#observations-section-2_0") || 
+                document.querySelector("table.observations");
+  if (!table) {
+    alert("Section 2.0 table not found.");
+    return;
+  }
+
+  const rows = table.querySelectorAll("tbody tr");
+  if (!rows || rows.length === 0) {
+    alert("No equipment rows found to verify.");
+    return;
+  }
+
+  const itemsToFetch = [];
+  rows.forEach((tr) => {
+    const bcInput = tr.querySelector("input[name='barcode_kavach_main_unit'], td:nth-child(2) input[type='text'], input[placeholder*='Barcode']");
+    const atrInput = tr.querySelector(".atr-serial-input");
+    const statusDiv = tr.querySelector(".atr-status-msg");
+    const selectEl = tr.querySelector("select");
+    const remarksEl = tr.querySelector(".remarks textarea");
+
+    const scannedValue = (bcInput ? bcInput.value : "").trim();
+    const atrValue = (atrInput ? atrInput.value : "").trim();
+    const partNo = scannedValue || atrValue;
+
+    if (partNo) {
+      itemsToFetch.push({
+        tr,
+        bcInput,
+        atrInput,
+        statusDiv,
+        selectEl,
+        remarksEl,
+        scannedValue,
+        partNo
+      });
+    }
+  });
+
+  if (itemsToFetch.length === 0) {
+    alert("Please scan or enter at least one equipment barcode or serial number first.");
+    return;
+  }
+
+  const allBtns = document.querySelectorAll("#fetch-unit-atr-btn, #fetch-unit-atr-btn-sec");
+  allBtns.forEach(b => {
+    b.disabled = true;
+    b.dataset.origText = b.textContent;
+    b.textContent = "⏳ Fetching...";
+  });
+
+  let matchedCount = 0;
+  let manualCount = 0;
+
+  const promises = itemsToFetch.map(async (item) => {
+    const { tr, bcInput, atrInput, statusDiv, selectEl, remarksEl, scannedValue, partNo } = item;
+    if (statusDiv) {
+      statusDiv.innerHTML = '<span style="color: #007bff;">Fetching ATR...</span>';
+    }
+
+    try {
+      const response = await fetch(`/api/part-details?partNo=${encodeURIComponent(partNo)}`, {
+        cache: "no-store"
+      });
+      let result = null;
+      try {
+        result = await response.json();
+      } catch (jsonErr) {
+        console.warn("JSON parse error:", jsonErr);
+      }
+
+      if (response.ok && result && (result.status === true || (result.data && result.data.matched === true))) {
+        const data = result.data || {};
+        const fetchedSerial = (data.partNo ? String(data.partNo).trim() : partNo);
+        const partName = data.name || data.description || "";
+
+        if (atrInput) {
+          atrInput.value = fetchedSerial;
+          atrInput.dataset.initialValue = fetchedSerial;
+          atrInput.style.backgroundColor = "#e8f8f5";
+          atrInput.style.borderColor = "#2ecc71";
+        }
+        if (bcInput && !bcInput.value.trim()) {
+          bcInput.value = fetchedSerial;
+          bcInput.dataset.initialValue = fetchedSerial;
+        }
+        if (typeof updateEditedBarcode === 'function' && tr.id) {
+          updateEditedBarcode(tr.id.replace('row-', ''), fetchedSerial);
+        }
+
+        const isMatch = scannedValue 
+          ? (scannedValue.toLowerCase() === fetchedSerial.toLowerCase() || data.matched === true)
+          : (data.matched === true);
+
+        if (isMatch) {
+          matchedCount++;
+          if (selectEl) {
+            selectEl.value = "Matching";
+            if (typeof highlightSelect === "function") highlightSelect(selectEl);
+          }
+          if (statusDiv) {
+            statusDiv.innerHTML = `<span style="color: #27ae60; font-weight: bold;">✔ Matched ${partName ? '(' + partName + ')' : ''}</span>`;
+          }
+        } else {
+          manualCount++;
+          if (selectEl) {
+            selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+            if (typeof highlightSelect === "function") highlightSelect(selectEl);
+          }
+          if (statusDiv) {
+            statusDiv.innerHTML = '<span style="color: #e67e22; font-weight: bold;">✖ Mismatch &rarr; Set to Manual</span>';
+          }
+        }
+      } else {
+        manualCount++;
+        if (selectEl) {
+          selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+          if (typeof highlightSelect === "function") highlightSelect(selectEl);
+        }
+        const errorMsg = (result && result.message) ? result.message : "Not Found";
+        if (statusDiv) {
+          statusDiv.innerHTML = `<span style="color: #e67e22; font-weight: bold;">✖ ${errorMsg} &rarr; Set to Manual</span>`;
+        }
+        if (remarksEl && !remarksEl.value.trim()) {
+          remarksEl.placeholder = "Manual verification remarks...";
+        }
+      }
+    } catch (err) {
+      console.error("Fetch unit ATR error:", err);
+      manualCount++;
+      if (selectEl) {
+        selectEl.value = [...selectEl.options].some(o => o.value === "Manual") ? "Manual" : "Not Matching";
+        if (typeof highlightSelect === "function") highlightSelect(selectEl);
+      }
+      if (statusDiv) {
+        statusDiv.innerHTML = `<span style="color: #dc3545; font-weight: bold;">⚠️ Verification error (${err.message || 'Failed to fetch'}) &rarr; Manual</span>`;
+      }
+    }
+  });
+
+  await Promise.all(promises);
+
+  allBtns.forEach(b => {
+    b.disabled = false;
+    b.textContent = b.dataset.origText || "Fetch";
+  });
+
+  if (typeof enableUpdateButton === "function") enableUpdateButton();
+  if (typeof markDataAsUnsaved === "function") markDataAsUnsaved();
+  if (typeof unsavedChanges !== "undefined") unsavedChanges = true;
+
+  alert(`Unit ATR Verification Complete:
+✔ ${matchedCount} Matched
+✖ ${manualCount} Set to Manual`);
 }

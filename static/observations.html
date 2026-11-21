@@ -12,17 +12,22 @@
   <script src="libs/jspdf.plugin.autotable.min.js"></script>
   <script>
     function formatDescription(description) {
-      let decoded = (description || "")
+      if (!description) return "";
+      let decoded = description
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
         .replace(/&amp;/g, "&")
         .replace(/&quot;/g, '"')
         .replace(/&#039;/g, "'");
+      let s = decoded
+        .replace(/<[^>]*>/g, "")
+        .trim()
+        .replace(/\s+/g, " ");
+      if (s.includes("Actual:") || s.includes("Actual / ATR:") || s.includes("Serial:") || s.includes("Serial / ATR:") || s.includes("ATR:")) {
+        return s;
+      }
       return (
-        decoded
-          .replace(/<[^>]*>/g, "")
-          .trim()
-          .replace(/\s+/g, " ")
+        s
           .replace(/:+(?=\s*\d)/g, "")
           .replace(/:+$/, "")
           .replace(/ (\d+)$/, " - $1")
@@ -292,8 +297,21 @@
         <tbody></tbody>
       `;
       const tbody = table.querySelector("tbody");
+
+      // Deduplicate observations by S_no so checkpoints never repeat
+      const uniqueObsMap = new Map();
+      (observations || []).forEach(obs => {
+        if (obs && obs.S_no) {
+          const snoKey = String(obs.S_no).trim();
+          if (!uniqueObsMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+            uniqueObsMap.set(snoKey, obs);
+          }
+        }
+      });
+      const uniqueObservations = Array.from(uniqueObsMap.values());
+
       const grouped = {};
-      observations.forEach(obs => {
+      uniqueObservations.forEach(obs => {
         const section = obs.S_no && typeof obs.S_no === 'string' && obs.S_no.includes('.') ? obs.S_no.split('.')[0] : null;
         if (!section) {
           console.warn(`Invalid S_no: ${obs.S_no}`);
@@ -302,7 +320,7 @@
         if (!grouped[section]) grouped[section] = [];
         grouped[section].push(obs);
       });
-      let closedPoints = 0;
+      const closedSet = new Set();
       const totalPoints = 183;
       Object.keys(grouped).sort((a, b) => Number(a) - Number(b)).forEach(section => {
         const sectionRows = grouped[section];
@@ -357,8 +375,29 @@
           let statusText = obs.observation_status || "";
           let heightValue = "";
           let observationContent = obs.observation_text || "";
-          if (obs.barcode && String(obs.barcode).trim() !== "") {
-            observationContent += " " + String(obs.barcode).trim();
+
+          const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
+          if (isSection2) {
+            let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]?\s*(?:Actual\s*\/\s*ATR|Serial\s*\/\s*ATR|Actual|Serial|ATR)\s*:\s*\d{2,20}.*$/i, '').replace(/[:\-]\s*\d{2,20}.*$/, '').trim();
+            baseDesc = baseDesc.replace(/[:\-]+$/, '').trim();
+            const scBarcode = (obs.barcode || '').trim();
+            const scAtr = (obs.atr_serial || '').trim();
+            if (scBarcode && scAtr && scBarcode === scAtr) {
+              observationContent = `${baseDesc} - Actual / ATR: ${scBarcode}`;
+            } else if (scBarcode && scAtr) {
+              observationContent = `${baseDesc} - Actual: ${scBarcode} (ATR: ${scAtr})`;
+            } else if (scBarcode) {
+              observationContent = `${baseDesc} - Actual: ${scBarcode}`;
+            } else if (scAtr) {
+              observationContent = `${baseDesc} - ATR: ${scAtr}`;
+            }
+          } else {
+            if (obs.barcode && String(obs.barcode).trim() !== "") {
+              observationContent += " " + String(obs.barcode).trim();
+            }
+            if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+              observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+            }
           }
           if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
             let heightMatch = statusText.match(/\(Height:\s*(\d+)\s*(?:mm)?\)/i);
@@ -398,6 +437,7 @@
             case 'Welding done':
             case 'Earthing done':
             case 'Matching':
+            case 'Manual':
             case 'Coating done':
             case 'Locked':
             case 'Applied':
@@ -410,7 +450,7 @@
             case 'Accepted with Deviation':
             case 'Accepted with deviation':
               statusColor = 'green';
-              closedPoints++;
+              closedSet.add(String(obs.S_no).trim());
               break;
             case 'Not Available':
             case 'Not Present':
@@ -466,7 +506,8 @@
         });
       });
       table.appendChild(tbody);
-      const openPoints = totalPoints - closedPoints;
+      const closedPoints = closedSet.size;
+      const openPoints = Math.max(0, totalPoints - closedPoints);
       const summaryTable = document.createElement("table");
       summaryTable.innerHTML = `
         <thead>
@@ -495,8 +536,20 @@
         console.error('Expected an array of observations, but got:', observations);
         return {};
       }
+      // Deduplicate by S_no so PDF generation never renders duplicate checkpoints
+      const uniqueMap = new Map();
+      observations.forEach(obs => {
+        if (obs && obs.S_no) {
+          const snoKey = String(obs.S_no).trim();
+          if (!uniqueMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+            uniqueMap.set(snoKey, obs);
+          }
+        }
+      });
+      const uniqueObservations = Array.from(uniqueMap.values());
+
       const grouped = {};
-      observations.forEach(observation => {
+      uniqueObservations.forEach(observation => {
         const section = observation.S_no && typeof observation.S_no === 'string' && observation.S_no.includes('.') ? observation.S_no.split('.')[0] : null;
         if (!section) {
           console.warn(`Invalid S_no: ${observation.S_no}`);
@@ -599,9 +652,19 @@
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
-        const observationsArray = observationsData.data.filter(obs =>
+        const rawObs = (observationsData.data || []).filter(obs =>
           obs.observation_status && obs.observation_status.trim() !== '' && obs.observation_status.trim() !== 'Select'
         );
+        const pdfUniqueMap = new Map();
+        rawObs.forEach(obs => {
+          if (obs && obs.S_no) {
+            const snoKey = String(obs.S_no).trim();
+            if (!pdfUniqueMap.has(snoKey) || (obs.observation_status && obs.observation_status !== 'Select')) {
+              pdfUniqueMap.set(snoKey, obs);
+            }
+          }
+        });
+        const observationsArray = Array.from(pdfUniqueMap.values());
 
         const imagePromises = observationsArray.map(async (obs) => {
           const imageList = [];
@@ -706,12 +769,26 @@
           finalY = 10;
         }
 
-        const totalPointsFixed = 183;
-        const closedPoints = observationsArray.filter(obs => {
+        const closedStatuses = [
+          "Available", "Present", "Ok", "Yes", "Routing Done", "Fixed", "Secured",
+          "Installed", "Connected", "Aligned", "Torquing done", "Positioning done",
+          "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable",
+          "Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented",
+          "Cable Ties Implemented", "Locked", "Verified and ok", "No but accepted", "No But Accepted",
+          "Accepted with Deviation", "Accepted with deviation", "Completed"
+        ];
+
+        const closedSet = new Set();
+        observationsArray.forEach(obs => {
           let baseStatus = obs.observation_status ? obs.observation_status.replace(/\s*\(\s*Height:.*?\s*\)/i, '').replace(/\n/g, '').trim() : "";
-          return ["Available", "Present", "Yes", "Routing Done", "Fixed", "Secured", "Installed", "Connected", "Aligned", "Torquing done", "Positioning done", "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented", "Locked", "Verified and ok", "No but accepted", "No But Accepted", "Accepted with Deviation", "Accepted with deviation"].includes(baseStatus);
-        }).length;
-        const openPoints = totalPointsFixed - closedPoints;
+          if (baseStatus && closedStatuses.includes(baseStatus)) {
+            closedSet.add(String(obs.S_no).trim());
+          }
+        });
+
+        const totalPointsFixed = 183;
+        const closedPoints = closedSet.size;
+        const openPoints = Math.max(0, totalPointsFixed - closedPoints);
 
 
 
@@ -1010,8 +1087,29 @@
             let statusText = obs.observation_status || "";
             let heightValue = "";
             let observationContent = obs.observation_text || "";
-            if (obs.barcode && String(obs.barcode).trim() !== "") {
-              observationContent += " " + String(obs.barcode).trim();
+
+            const isSection2 = obs.S_no && obs.S_no.startsWith("2.") && obs.S_no !== "2.1";
+            if (isSection2) {
+              let baseDesc = observationContent.replace(/<[^>]*>/g, '').replace(/[:\-]?\s*(?:Actual\s*\/\s*ATR|Serial\s*\/\s*ATR|Actual|Serial|ATR)\s*:\s*\d{2,20}.*$/i, '').replace(/[:\-]\s*\d{2,20}.*$/, '').trim();
+              baseDesc = baseDesc.replace(/[:\-]+$/, '').trim();
+              const scBarcode = (obs.barcode || '').trim();
+              const scAtr = (obs.atr_serial || '').trim();
+              if (scBarcode && scAtr && scBarcode === scAtr) {
+                observationContent = `${baseDesc} - Actual / ATR: ${scBarcode}`;
+              } else if (scBarcode && scAtr) {
+                observationContent = `${baseDesc} - Actual: ${scBarcode} (ATR: ${scAtr})`;
+              } else if (scBarcode) {
+                observationContent = `${baseDesc} - Actual: ${scBarcode}`;
+              } else if (scAtr) {
+                observationContent = `${baseDesc} - ATR: ${scAtr}`;
+              }
+            } else {
+              if (obs.barcode && String(obs.barcode).trim() !== "") {
+                observationContent += " " + String(obs.barcode).trim();
+              }
+              if (obs.atr_serial && String(obs.atr_serial).trim() !== "") {
+                observationContent += " (ATR: " + String(obs.atr_serial).trim() + ")";
+              }
             }
             if (["8.1", "8.2", "8.3", "8.4", "8.5", "8.6"].includes(obs.S_no)) {
               let heightMatch = statusText.match(/\(Height:\s*(\d+)\s*(?:mm)?\)/i);
@@ -1184,22 +1282,6 @@
         }
 
         // --- Pending Items Detailed Section ---
-        const closedStatuses = [
-          "Available", "Present", "Ok", "Yes", "Routing Done", "Fixed", "Secured",
-          "Installed", "Connected", "Aligned", "Torquing done", "Positioning done",
-          "Configured", "Welding done", "Earthing done", "Matching", "Not Applicable",
-          "Applicable", "Coating done", "Applied", "Cables Connected", "Metal clamps implemented",
-          "Locked", "Verified and ok", "No but accepted", "No But Accepted",
-          "Accepted with Deviation", "Accepted with deviation", "Completed"
-        ];
-
-        const closedSet = new Set();
-        observationsArray.forEach(obs => {
-          let baseStatus = obs.observation_status ? obs.observation_status.replace(/\s*\(\s*Height:.*?\s*\)/i, '').replace(/\n/g, '').trim() : "";
-          if (baseStatus && closedStatuses.includes(baseStatus)) {
-            closedSet.add(String(obs.S_no).trim());
-          }
-        });
 
         const sectionTitles = {
           1: "DOCUMENT VERIFICATION",

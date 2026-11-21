@@ -23,3 +23,6 @@ scratch/
 # User uploads & media (folder preserved via .gitkeep)
 uploads/*
 !uploads/.gitkeep
+
+# Extracted equipment master (compressed .gz is committed)
+database/equipment_master.db

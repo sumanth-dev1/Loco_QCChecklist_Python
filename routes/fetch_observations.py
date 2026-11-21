@@ -26,8 +26,15 @@ def fetch_observations():
         cursor = conn.cursor(dictionary=True, buffered=True)
         observations = []
 
+        try:
+            cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+        except Exception:
+            has_atr_col = False
+        atr_col_expr = ", atr_serial" if has_atr_col else ", NULL as atr_serial"
+
         for table_name in TABLE_NAMES:
-            barcode_select = ", barcode" if table_name == "verify_serial_numbers_of_equipment_as_per_ic" else ", NULL as barcode"
+            barcode_select = f", barcode {atr_col_expr}" if table_name == "verify_serial_numbers_of_equipment_as_per_ic" else ", NULL as barcode, NULL as atr_serial"
             sql = f"SELECT S_no, observation_text, observation_status, remarks, created_at, updated_at {barcode_select} FROM {table_name} WHERE loco_id = %s"
             cursor.execute(sql, (loco_id,))
             rows = cursor.fetchall()
@@ -47,9 +54,27 @@ def fetch_observations():
                     'remarks': row['remarks'],
                     'image_paths': image_paths,
                     'barcode': row.get('barcode'),
+                    'atr_serial': row.get('atr_serial'),
                     'created_at': str(row['created_at']) if row.get('created_at') else None,
                     'updated_at': str(row['updated_at']) if row.get('updated_at') else None
                 })
+
+        # Deduplicate observations by S_no to guarantee no section repeats
+        dedup_observations = {}
+        for obs in observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        observations = list(dedup_observations.values())
 
         if observations:
             return jsonify({'status': 'success', 'data': observations})

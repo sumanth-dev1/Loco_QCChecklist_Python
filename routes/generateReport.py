@@ -1,6 +1,6 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import html, os
+import html, os, re
 from flask import Blueprint, request, jsonify
 from db import get_connection
 
@@ -46,6 +46,10 @@ def generateReport():
             pass
         try:
             cursor.execute("ALTER TABLE verify_serial_numbers_of_equipment_as_per_ic ADD COLUMN barcode_status VARCHAR(50) NULL")
+        except Exception:
+            pass
+        try:
+            cursor.execute("ALTER TABLE verify_serial_numbers_of_equipment_as_per_ic ADD COLUMN atr_serial VARCHAR(255) NULL")
         except Exception:
             pass
         try:
@@ -149,8 +153,15 @@ def generateReport():
         host = request.host
         protocol = "https://" if request.is_secure else "http://"
 
+        try:
+            cursor.execute("SHOW COLUMNS FROM verify_serial_numbers_of_equipment_as_per_ic LIKE 'atr_serial'")
+            has_atr_col = bool(cursor.fetchone())
+        except Exception:
+            has_atr_col = False
+        atr_col_expr = ", atr_serial" if has_atr_col else ", NULL as atr_serial"
+
         for table_name in TABLE_NAMES:
-            barcode_select = ", barcode" if table_name == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode"
+            barcode_select = f", barcode {atr_col_expr}" if table_name == 'verify_serial_numbers_of_equipment_as_per_ic' else ", NULL as barcode, NULL as atr_serial"
             query = f"""SELECT S_no, observation_text, remarks, observation_status, section_id {barcode_select}
                       FROM {table_name}
                       WHERE loco_id = %s
@@ -163,6 +174,17 @@ def generateReport():
             tbl_obs = cursor.fetchall()
 
             for obs in tbl_obs:
+                if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
+                    if not obs.get('barcode') and obs.get('observation_text'):
+                        m = re.search(r'[:\-]\s*(\d{2,20})\b', str(obs['observation_text'])) or re.search(r'\b(\d{10,15})\b', str(obs['observation_text']))
+                        if m:
+                            obs['barcode'] = m.group(1)
+                    if not obs.get('atr_serial') and obs.get('barcode'):
+                        obs['atr_serial'] = obs.get('barcode')
+                if obs.get('observation_text'):
+                    obs['observation_text'] = html.unescape(obs['observation_text'])
+                    if '&lt;' in obs['observation_text']:
+                        obs['observation_text'] = html.unescape(obs['observation_text'])
                 imgs_for_sno = all_images.get(obs['S_no'], [])
                 valid_images = []
                 for img_path in imgs_for_sno:
@@ -174,6 +196,23 @@ def generateReport():
 
                 obs['images'] = valid_images
                 observations.append(obs)
+
+        # Deduplicate observations by S_no to guarantee no section or checkpoint repeats
+        dedup_observations = {}
+        for obs in observations:
+            sno = str(obs.get('S_no') or '').strip()
+            if not sno:
+                continue
+            if sno not in dedup_observations:
+                dedup_observations[sno] = obs
+            else:
+                existing_stat = str(dedup_observations[sno].get('observation_status') or '').strip()
+                curr_stat = str(obs.get('observation_status') or '').strip()
+                if curr_stat and not existing_stat:
+                    dedup_observations[sno] = obs
+                elif curr_stat:
+                    dedup_observations[sno] = obs
+        observations = list(dedup_observations.values())
 
         return jsonify({
             'success': True,

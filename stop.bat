@@ -6,28 +6,16 @@ echo ========================================================
 echo               STOPPING LOCO QC SERVER
 echo ========================================================
 
-set found=0
+:: 1. Force kill via PowerShell (checks port 5000 and kills owning processes)
+powershell.exe -NoProfile -Command "Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Write-Host 'Killing PID on port 5000:' $_.OwningProcess; Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"
 
-:: Kill any process listening on port 5000
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5000" ^| findstr "LISTENING"') do (
-    set found=1
-    taskkill /F /PID %%a >nul 2>&1
-)
+:: 2. Force kill any python process running from this venv directory
+powershell.exe -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name like 'python%%'\" | Where-Object { $_.CommandLine -like '*Loco_QCChecklist_Python*' } | ForEach-Object { Write-Host 'Killing Python process:' $_.ProcessId; Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
 
-:: Also close any window titled Loco QC Waitress Server
+:: 3. Close any window titled Loco QC Waitress Server
 taskkill /F /FI "WINDOWTITLE eq Loco QC Waitress Server*" /T >nul 2>&1
 
-timeout /t 1 >nul 2>&1
-
-:: Verify port is freed
-netstat -aon | findstr ":5000" | findstr "LISTENING" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    echo [WARNING] Port 5000 is still in use. Retrying...
-    for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":5000" ^| findstr "LISTENING"') do (
-        taskkill /F /PID %%a >nul 2>&1
-    )
-)
-
 echo.
-echo Loco QC server has been stopped.
-timeout /t 2 >nul
+echo Server stop command executed. Checking port 5000...
+powershell.exe -NoProfile -Command "$conn = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue; if ($conn) { Write-Host '[WARNING] Port 5000 still occupied by PID:' $conn.OwningProcess } else { Write-Host '[SUCCESS] Port 5000 is now FREE.' }"
+echo ========================================================

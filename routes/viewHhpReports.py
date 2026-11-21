@@ -35,6 +35,71 @@ VIEW_HHP_REPORTS_HTML = """<!DOCTYPE html>
     
     .upload-btn { background-color: #6f42c1; color: white; border: none; padding: 5px 10px; margin: 5px; cursor: pointer; border-radius: 5px; display: inline-block; }
     .upload-btn:hover { background-color: #5a32a3; }
+    
+    .wfms-modal {
+        display: none;
+        position: fixed;
+        z-index: 3000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        justify-content: center;
+        align-items: center;
+    }
+    .wfms-modal-content {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        width: 400px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .wfms-modal-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #6f42c1;
+    }
+    .wfms-form-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    .wfms-form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    .wfms-form-group input, .wfms-form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .wfms-btn-row {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #6f42c1;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 2s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -93,6 +158,50 @@ VIEW_HHP_REPORTS_HTML = """<!DOCTYPE html>
     </table>
 </div>
 
+<div id="wfmsLoginModal" class="wfms-modal">
+    <div class="wfms-modal-content">
+        <div class="wfms-modal-header">Login to Loco WFMS</div>
+        <div id="login_error" style="color:red; font-size:0.9rem; margin-bottom:10px; display:none;"></div>
+        <div class="wfms-form-group">
+            <label for="wfms_user">Username</label>
+            <input type="text" id="wfms_user" placeholder="Enter your credentials">
+        </div>
+        <div class="wfms-form-group">
+            <label for="wfms_pass">Password</label>
+            <input type="password" id="wfms_pass" placeholder="Enter your password">
+        </div>
+        <div class="wfms-btn-row">
+            <button class="btn back-btn" onclick="closeWFMSModal('wfmsLoginModal')">Cancel</button>
+            <button class="btn upload-btn" id="loginBtn" onclick="doWFMSLogin()">Login & Next</button>
+        </div>
+    </div>
+</div>
+
+<div id="wfmsLocoModal" class="wfms-modal">
+    <div class="wfms-modal-content">
+        <div class="wfms-modal-header">Select Loco Assignment</div>
+        <div id="loco_status_text" style="font-size:0.95rem; margin-bottom:15px; line-height:1.5; text-align:left;">
+            Verifying assignment...
+        </div>
+        <div class="wfms-form-group" id="locoSelectGroup" style="display:none;">
+            <label for="wfms_loco_select" style="font-weight:600; display:block; margin-bottom:5px;">Select Assigned Loco</label>
+            <select id="wfms_loco_select" onchange="onLocoSelected()" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:0.95rem;">
+                <option value="" disabled selected>Select a Loco</option>
+            </select>
+        </div>
+        <div class="wfms-form-group" id="docSelectGroup" style="display:none; margin-top:10px;">
+            <label for="wfms_doc_select" style="font-weight:600; display:block; margin-bottom:5px;">Document Slot</label>
+            <select id="wfms_doc_select" onchange="onDocSelected()" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:0.95rem;">
+            </select>
+        </div>
+        <div id="verification_details" style="font-size:0.9rem; margin-top:15px; line-height:1.4; text-align:left;"></div>
+        <div class="wfms-btn-row" style="margin-top:20px;">
+            <button class="btn back-btn" onclick="closeWFMSModal('wfmsLocoModal')">Cancel</button>
+            <button class="btn upload-btn" id="pushBtn" onclick="doFinalPush()" style="display:none;">Push Report</button>
+        </div>
+    </div>
+</div>
+
 <script>
   function clearSearchAutofill() {
     const searchInput = document.getElementById('search-input');
@@ -115,7 +224,6 @@ VIEW_HHP_REPORTS_HTML = """<!DOCTYPE html>
     const tableRows = document.querySelectorAll('#report-table tbody tr');
 
     if (searchInput) {
-
       searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         tableRows.forEach(row => {
@@ -126,8 +234,261 @@ VIEW_HHP_REPORTS_HTML = """<!DOCTYPE html>
     }
   });
 
+  let currentReportId = null;
+  let currentLocoId = null;
+  let wfmsToken = null;
+  let assignedActivities = [];
+  let targetActivityId = null;
+  let targetDocId = null;
+
   function openWFMSLogin(event, reportId, locoId) {
-    alert(`WFMS Integration for Loco ID: ${locoId}`);
+    if (!navigator.onLine) {
+        alert("No internet connection. Please check your connectivity to push to WFMS.");
+        return;
+    }
+    currentReportId = reportId;
+    currentLocoId = locoId;
+    
+    document.getElementById('wfms_user').value = '';
+    document.getElementById('wfms_pass').value = '';
+    document.getElementById('login_error').style.display = 'none';
+    
+    document.getElementById('wfmsLoginModal').style.display = 'flex';
+  }
+
+  function closeWFMSModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  async function doWFMSLogin() {
+    const user = document.getElementById('wfms_user').value.trim();
+    const pass = document.getElementById('wfms_pass').value.trim();
+    const errorDiv = document.getElementById('login_error');
+    const btn = document.getElementById('loginBtn');
+
+    if (!user || !pass) {
+        errorDiv.innerText = "Please enter WFMS credentials";
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    errorDiv.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span> Connecting...';
+
+    try {
+        const response = await fetch('wfms_proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=login&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`
+        });
+        const result = await response.json();
+
+        if (result.status && result.data && result.data.token) {
+            wfmsToken = result.data.token;
+            closeWFMSModal('wfmsLoginModal');
+            verifyLocoAndGetDetails();
+        } else {
+            errorDiv.innerText = result.message || "Invalid WFMS credentials";
+            errorDiv.style.display = 'block';
+        }
+    } catch (e) {
+        errorDiv.innerText = "Error connecting to WFMS Server";
+        errorDiv.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Login & Next";
+    }
+  }
+
+  async function verifyLocoAndGetDetails() {
+    const modal = document.getElementById('wfmsLocoModal');
+    const statusText = document.getElementById('loco_status_text');
+    const pushBtn = document.getElementById('pushBtn');
+    const selectGroup = document.getElementById('locoSelectGroup');
+    const docSelectGroup = document.getElementById('docSelectGroup');
+    const select = document.getElementById('wfms_loco_select');
+    const detailsDiv = document.getElementById('verification_details');
+    
+    modal.style.display = 'flex';
+    pushBtn.style.display = 'none';
+    selectGroup.style.display = 'none';
+    docSelectGroup.style.display = 'none';
+    detailsDiv.innerHTML = '';
+    statusText.innerHTML = `<span class="loader"></span> Fetching active assignments from Loco WFMS...`;
+
+    try {
+        const response = await fetch('wfms_proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=get_assignments&token=${encodeURIComponent(wfmsToken)}`
+        });
+        const result = await response.json();
+
+        if (!result.status || !result.data || !result.data.data) {
+            statusText.innerHTML = `<span style="color:red;">Error fetching assignments from Loco WFMS: ${result.message || 'Unknown error'}</span>`;
+            return;
+        }
+
+        assignedActivities = result.data.data;
+        const matchingActs = assignedActivities.filter(act => act.loco && act.loco.number);
+
+        if (matchingActs.length === 0) {
+            statusText.innerHTML = `<span style="color:red;">No active assignments found on your dashboard.</span>`;
+            return;
+        }
+
+        select.innerHTML = '<option value="" disabled selected>Select an Activity Assignment</option>';
+        let autoSelectedId = null;
+        matchingActs.forEach(act => {
+            const opt = document.createElement('option');
+            opt.value = act._id;
+            opt.text = `Loco #${act.loco.number} - ${act.name}`;
+            const cleanActLoco = String(act.loco.number).replace(/^0+/, '');
+            const cleanCurLoco = String(currentLocoId || '').replace(/^0+/, '');
+            if (cleanActLoco && cleanCurLoco && cleanActLoco === cleanCurLoco && !autoSelectedId) {
+                opt.selected = true;
+                autoSelectedId = act._id;
+            }
+            select.appendChild(opt);
+        });
+
+        selectGroup.style.display = 'block';
+        statusText.innerHTML = "Choose a locomotive activity assignment from the dropdown below:";
+
+        if (autoSelectedId) {
+            onLocoSelected();
+        }
+    } catch (e) {
+        statusText.innerHTML = `<span style="color:red;">Connection error during verification: ${e.message}</span>`;
+    }
+  }
+
+  async function onLocoSelected() {
+    const select = document.getElementById('wfms_loco_select');
+    const activityId = select.value;
+    const detailsDiv = document.getElementById('verification_details');
+    const pushBtn = document.getElementById('pushBtn');
+    const docSelectGroup = document.getElementById('docSelectGroup');
+    const docSelect = document.getElementById('wfms_doc_select');
+
+    if (!activityId) return;
+
+    pushBtn.style.display = 'none';
+    docSelectGroup.style.display = 'none';
+    detailsDiv.innerHTML = `<span class="loader"></span> Resolving document slot for QC Checklist...`;
+
+    try {
+        const selectedAct = assignedActivities.find(act => act._id === activityId);
+        const locoNum = selectedAct ? selectedAct.loco.number : '';
+
+        const detailsResponse = await fetch('wfms_proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=get_activity_details&token=${encodeURIComponent(wfmsToken)}&activityId=${encodeURIComponent(activityId)}`
+        });
+        const detailsResult = await detailsResponse.json();
+
+        if (!detailsResult.status || !detailsResult.data) {
+            detailsDiv.innerHTML = `<span style="color:red;">Error fetching activity details: ${detailsResult.message || 'Unknown error'}</span>`;
+            return;
+        }
+
+        const activityDetails = detailsResult.data;
+        const qcFiles = activityDetails.qcFiles || [];
+
+        if (qcFiles.length === 0) {
+            detailsDiv.innerHTML = `<span style="color:red;">Configuration Error: No QC document slots found in this activity.</span>`;
+            return;
+        }
+
+        // Search for best matching QC checklist document slot
+        let targetDoc = qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("in-process qc checklist")
+        ) || qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("qc checklist")
+        ) || qcFiles.find(doc => 
+            doc.name && doc.name.toLowerCase().includes("checklist")
+        );
+
+        // Populate doc selector
+        docSelect.innerHTML = '';
+        qcFiles.forEach(doc => {
+            const opt = document.createElement('option');
+            opt.value = doc._id;
+            opt.text = doc.name;
+            if (targetDoc && doc._id === targetDoc._id) {
+                opt.selected = true;
+            }
+            docSelect.appendChild(opt);
+        });
+
+        if (!targetDoc) {
+            targetDoc = qcFiles[0];
+        }
+
+        targetActivityId = activityId;
+        targetDocId = targetDoc ? targetDoc._id : null;
+
+        if (qcFiles.length > 1) {
+            docSelectGroup.style.display = 'block';
+        }
+
+        detailsDiv.innerHTML = `
+            <div style="color:green; font-weight:bold; margin-bottom:10px;">Verification Successful!</div>
+            <strong>Selected Loco:</strong> #${locoNum}<br>
+            <strong>Activity:</strong> ${selectedAct ? selectedAct.name : ''}<br>
+            <strong>Document Slot:</strong> ${targetDoc ? targetDoc.name : 'Selected Slot'}
+        `;
+        pushBtn.style.display = 'inline-block';
+    } catch (e) {
+        detailsDiv.innerHTML = `<span style="color:red;">Verification error: ${e.message}</span>`;
+    }
+  }
+
+  function onDocSelected() {
+    const docSelect = document.getElementById('wfms_doc_select');
+    targetDocId = docSelect.value;
+  }
+
+  async function doFinalPush() {
+    const detailsDiv = document.getElementById('verification_details');
+    const pushBtn = document.getElementById('pushBtn');
+    
+    pushBtn.disabled = true;
+    pushBtn.innerHTML = '<span class="loader"></span> Uploading...';
+    detailsDiv.innerHTML = `<span class="loader"></span> Uploading report to Loco WFMS...`;
+
+    try {
+        const formData = new FormData();
+        formData.append('reportId', currentReportId);
+        formData.append('activityId', targetActivityId);
+        formData.append('docId', targetDocId);
+        formData.append('wfms_token', wfmsToken);
+        formData.append('is_hhp', '1');
+
+        const uploadResponse = await fetch('upload-to-wfms', {
+            method: 'POST',
+            body: formData
+        });
+        const uploadResult = await uploadResponse.json();
+
+        if (uploadResult.success) {
+            detailsDiv.innerHTML = `<span style="color:green; font-weight:bold;">Success: ${uploadResult.message}</span>`;
+            setTimeout(() => {
+                alert("Success: " + uploadResult.message);
+                location.reload();
+            }, 1000);
+        } else {
+            detailsDiv.innerHTML = `<span style="color:red;">Upload failed: ${uploadResult.message}</span>`;
+            pushBtn.disabled = false;
+            pushBtn.innerText = "Push Report";
+        }
+    } catch (e) {
+        detailsDiv.innerHTML = `<span style="color:red;">Upload error: ${e.message}</span>`;
+        pushBtn.disabled = false;
+        pushBtn.innerText = "Push Report";
+    }
   }
 </script>
 
@@ -149,13 +510,19 @@ def viewHhpReports():
         conn = get_hhp_connection()
         cursor = conn.cursor(dictionary=True, buffered=True)
 
-        # Ensure report table exists in hhp_loco_info
+        # Ensure report table exists in hhp_loco_info with last_uploaded_hash
         cursor.execute("""CREATE TABLE IF NOT EXISTS `report` (
             `id` INT AUTO_INCREMENT PRIMARY KEY,
             `user_id` VARCHAR(100) NOT NULL,
             `file_name` VARCHAR(255) NOT NULL,
-            `upload_date` DATETIME NOT NULL
+            `upload_date` DATETIME NOT NULL,
+            `last_uploaded_hash` VARCHAR(64) DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;""")
+
+        try:
+            cursor.execute("ALTER TABLE `report` ADD COLUMN `last_uploaded_hash` VARCHAR(64) DEFAULT NULL")
+        except Exception:
+            pass
 
         # Look up user from master loginpage to accurately determine role & employee name
         try:

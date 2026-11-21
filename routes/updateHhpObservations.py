@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import json, re
 from flask import Blueprint, request, jsonify
 from db import get_hhp_connection
+from routes.upload import sanitize_and_save_image_path
 
 updateHhpObservations_bp = Blueprint('updateHhpObservations', __name__)
 
@@ -80,7 +81,8 @@ def updateHhpObservations():
             s_no = str(obs.get('S_no', '')).strip()
             remarks = obs.get('remarks', '')
             status = obs.get('observation_status', '')
-            new_barcode = str(obs.get('barcode', '')).strip() if obs.get('barcode') is not None else ''
+            new_barcode = str(obs.get('barcode') or obs.get('barcode_kavach_main_unit') or '').strip()
+            new_atr = str(obs.get('atr_serial') or new_barcode).strip() if obs.get('barcode') is not None else ''
             new_height = str(obs.get('height', '')).strip() if obs.get('height') is not None else ''
             client_obs_text = str(obs.get('observation_text', '')).strip()
             image_paths = obs.get('image_paths') or []
@@ -122,10 +124,23 @@ def updateHhpObservations():
                     observation_text = updated_desc
 
                 if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
-                    upd_sql = f"""UPDATE `{table_name}` 
-                                  SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, observation_status = %s, remarks = %s, updated_at = NOW() 
-                                  WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.')) AND s_no = %s"""
-                    cursor.execute(upd_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, section_id, s_no))
+                    try:
+                        cursor.execute("ALTER TABLE `verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+                    except Exception:
+                        pass
+                    cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+                    has_atr_col = bool(cursor.fetchone())
+
+                    if has_atr_col:
+                        upd_sql = f"""UPDATE `{table_name}` 
+                                      SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, atr_serial = %s, observation_status = %s, remarks = %s, updated_at = NOW() 
+                                      WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s"""
+                        cursor.execute(upd_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, new_atr, status, remarks, loco_id, section_id, section_id, section_id, s_no))
+                    else:
+                        upd_sql = f"""UPDATE `{table_name}` 
+                                      SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, barcode = %s, observation_status = %s, remarks = %s, updated_at = NOW() 
+                                      WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s"""
+                        cursor.execute(upd_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, new_barcode, status, remarks, loco_id, section_id, section_id, section_id, s_no))
                 else:
                     upd_sql = f"""UPDATE `{table_name}` 
                                   SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, observation_status = %s, remarks = %s, updated_at = NOW() 
@@ -139,15 +154,29 @@ def updateHhpObservations():
                     cursor.execute(del_img, (loco_id, s_no))
                     ins_img = "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())"
                     for img_p in image_paths:
-                        cursor.execute(ins_img, ('hhp_section', loco_id, s_no, img_p))
+                        clean_p = sanitize_and_save_image_path(img_p)
+                        if clean_p:
+                            cursor.execute(ins_img, ('hhp_section', loco_id, s_no, clean_p))
 
             else:
                 # Insert
                 if table_name == 'verify_serial_numbers_of_equipment_as_per_ic':
-                    ins_sql = f"""INSERT INTO `{table_name}` 
-                                  (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, observation_status, remarks, created_at, updated_at) 
-                                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
-                    cursor.execute(ins_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text, new_barcode, status, remarks))
+                    try:
+                        cursor.execute("ALTER TABLE `verify_serial_numbers_of_equipment_as_per_ic` ADD COLUMN `atr_serial` VARCHAR(255) NULL")
+                    except Exception:
+                        pass
+                    cursor.execute("SHOW COLUMNS FROM `verify_serial_numbers_of_equipment_as_per_ic` LIKE 'atr_serial'")
+                    has_atr_col = bool(cursor.fetchone())
+                    if has_atr_col:
+                        ins_sql = f"""INSERT INTO `{table_name}` 
+                                      (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, atr_serial, observation_status, remarks, created_at, updated_at) 
+                                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+                        cursor.execute(ins_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text, new_barcode, new_atr, status, remarks))
+                    else:
+                        ins_sql = f"""INSERT INTO `{table_name}` 
+                                      (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, barcode, observation_status, remarks, created_at, updated_at) 
+                                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())"""
+                        cursor.execute(ins_sql, (loco_id, section_id, s_no, loco_type, brake_type, railway_division, shed_name, inspection_date, client_obs_text, new_barcode, status, remarks))
                 else:
                     insert_text = client_obs_text
                     if table_name == 'loco_antenna_and_gps_gsm_antenna' and s_no in ['8.1', '8.2', '8.3', '8.4', '8.5', '8.6']:
@@ -171,7 +200,9 @@ def updateHhpObservations():
                 if isinstance(image_paths, list) and image_paths:
                     ins_img = "INSERT INTO images (entity_type, loco_id, s_no, image_path, created_at) VALUES (%s, %s, %s, %s, NOW())"
                     for img_p in image_paths:
-                        cursor.execute(ins_img, ('hhp_section', loco_id, s_no, img_p))
+                        clean_p = sanitize_and_save_image_path(img_p)
+                        if clean_p:
+                            cursor.execute(ins_img, ('hhp_section', loco_id, s_no, clean_p))
 
             debug_info.append(debug_entry)
 

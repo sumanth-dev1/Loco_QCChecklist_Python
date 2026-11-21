@@ -23,7 +23,7 @@ if (-not (Test-Path $iconPath) -and (Test-Path $logoPath)) {
     }
 }
 
-# 1. Create Desktop Shortcut: Loco QC
+# 1. Create Desktop Shortcut: Loco QC (.lnk)
 $wsh = New-Object -ComObject WScript.Shell
 $shortcutPath = Join-Path $desktopDir "Loco QC.lnk"
 $shortcut = $wsh.CreateShortcut($shortcutPath)
@@ -39,18 +39,16 @@ if (Test-Path $iconPath) {
 $shortcut.Save()
 Write-Output "Created Desktop Shortcut at: $shortcutPath"
 
-# 2. Also create a URL shortcut on Desktop as backup
-$urlPath = Join-Path $desktopDir "Loco QC (Web Link).url"
-$urlContent = @"
-[InternetShortcut]
-URL=http://localhost:5000/
-IconIndex=0
-IconFile=$iconPath
-"@
-[System.IO.File]::WriteAllText($urlPath, $urlContent)
-Write-Output "Created Web Link at: $urlPath"
+# Clean up redundant legacy web link if it exists on Desktop
+$oldUrlPath = Join-Path $desktopDir "Loco QC (Web Link).url"
+if (Test-Path $oldUrlPath) {
+    try {
+        Remove-Item $oldUrlPath -Force -ErrorAction SilentlyContinue
+        Write-Output "Removed redundant Web Link from Desktop: $oldUrlPath"
+    } catch {}
+}
 
-# 3. Add to Windows Startup folder so server runs automatically on boot
+# 2. Add to Windows Startup folder so server runs automatically on boot
 $startupDir = [System.Environment]::GetFolderPath('Startup')
 $startupShortcutPath = Join-Path $startupDir "Loco QC Server.lnk"
 $startupShortcut = $wsh.CreateShortcut($startupShortcutPath)
