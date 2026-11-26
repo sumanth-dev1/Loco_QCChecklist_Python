@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QA Audit Report</title>
+  <script src="auth_guard.js?v=1.0" data-require-auth="true"></script>
   <style>
     /* General Body Style */
     body {
@@ -502,32 +503,20 @@
 
 
  
-function createNewReport() {
-  // Preserve the user ID and employee name before clearing storage.
-  const storedUserId = localStorage.getItem("user_id");
-  const storedEmployeeName = localStorage.getItem("employee_name");
-
-  // Clear all storage.
+function startChecklistFlow(targetUrl) {
+  const authSnapshot = window.AuthGuard ? window.AuthGuard.snapshotAuthStorage() : {};
   sessionStorage.clear();
   localStorage.clear();
-
-  // Restore the preserved values.
-  if (storedUserId) {
-    localStorage.setItem("user_id", storedUserId);
+  if (window.AuthGuard) {
+    window.AuthGuard.restoreAuthStorage(authSnapshot);
   }
-  if (storedEmployeeName) {
-    localStorage.setItem("employee_name", storedEmployeeName);
-  }
-
-  // Redirect to create.html with the default section.
-  window.location.href = 'create.html#0.0';
+  window.location.href = targetUrl;
 }
 
+function createNewReport() {
+  startChecklistFlow('create.html#0.0');
+}
 
-
-
-
-    
     function showCreateReportModal() {
       document.getElementById('createReportModal').style.display = 'flex';
     }
@@ -545,29 +534,11 @@ function createNewReport() {
     }
 
     function createStandardReport() {
-      const storedUserId = localStorage.getItem("user_id");
-      const storedEmployeeName = localStorage.getItem("employee_name");
-
-      sessionStorage.clear();
-      localStorage.clear();
-
-      if (storedUserId) localStorage.setItem("user_id", storedUserId);
-      if (storedEmployeeName) localStorage.setItem("employee_name", storedEmployeeName);
-
-      window.location.href = 'create.html#0.0';
+      startChecklistFlow('create.html#0.0');
     }
 
     function createHhpReport() {
-      const storedUserId = localStorage.getItem("user_id");
-      const storedEmployeeName = localStorage.getItem("employee_name");
-
-      sessionStorage.clear();
-      localStorage.clear();
-
-      if (storedUserId) localStorage.setItem("user_id", storedUserId);
-      if (storedEmployeeName) localStorage.setItem("employee_name", storedEmployeeName);
-
-      window.location.href = 'create_hhp.html#0.0';
+      startChecklistFlow('create_hhp.html#0.0');
     }
 
     function openViewReports() {
@@ -601,8 +572,12 @@ function createNewReport() {
     }
 
     function logout() {
-      alert("Logging out...");
-      window.location.href = 'login.html';
+      if (window.AuthGuard) {
+        window.AuthGuard.performLogout(true);
+      } else {
+        alert("Logging out...");
+        window.location.href = 'logout';
+      }
     }
 
     // Open the manual PDF in a new tab

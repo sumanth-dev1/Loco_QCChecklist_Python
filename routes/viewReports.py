@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import re
 from flask import Blueprint, session, render_template_string, request
 from db import get_connection
+from routes.login import is_authenticated
 
 viewReports_bp = Blueprint('viewReports', __name__)
 
@@ -465,9 +466,10 @@ VIEW_REPORTS_HTML = """<!DOCTYPE html>
 
 @viewReports_bp.route('/viewReports', methods=['GET', 'POST'])
 def viewReports():
-    username = session.get('username') or request.args.get('username') or request.args.get('user_id')
-    if not username:
+    if not is_authenticated():
+        session.clear()
         return '<script>alert("Unauthorized access. Please log in."); window.location.href="login.html";</script>', 401
+    username = session.get('username')
 
     employee_name = session.get('employee_name', 'Unknown Employee')
     role = session.get('role', 'user')
@@ -486,9 +488,6 @@ def viewReports():
             session['username'] = username
             session['employee_name'] = employee_name
             session['role'] = role
-
-        if request.args.get('role'):
-            role = request.args.get('role')
 
         if role == 'admin':
             sql = "SELECT id, file_name, upload_date, DATE_FORMAT(upload_date, '%H:%i') AS upload_time, user_id FROM report ORDER BY upload_date DESC"

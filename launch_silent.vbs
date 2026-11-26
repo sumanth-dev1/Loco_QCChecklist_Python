@@ -41,5 +41,5 @@ If ret <> 0 Then
     End If
 End If
 
-' 2. Open application in default browser
-WshShell.Run "http://localhost:5000/"
+' 2. Open login page in default browser
+WshShell.Run "http://localhost:5000/login.html"

@@ -30,7 +30,7 @@ $shortcut = $wsh.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = "wscript.exe"
 $shortcut.Arguments = "`"$projectDir\launch_silent.vbs`""
 $shortcut.WorkingDirectory = $projectDir
-$shortcut.Description = "Launch Loco QC Application (http://localhost:5000/)"
+$shortcut.Description = "Launch Loco QC Application (http://localhost:5000/login.html)"
 if (Test-Path $iconPath) {
     $shortcut.IconLocation = "$iconPath,0"
 } else {

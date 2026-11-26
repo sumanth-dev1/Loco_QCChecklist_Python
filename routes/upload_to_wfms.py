@@ -4,6 +4,7 @@ import hashlib, requests, urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from flask import Blueprint, request, jsonify, session
 from db import get_connection, get_hhp_connection
+from routes.login import is_authenticated
 
 upload_to_wfms_bp = Blueprint('upload_to_wfms', __name__)
 
@@ -11,7 +12,7 @@ WFMS_BASE_URL = "https://eg.hbl.in:5105/api"
 
 @upload_to_wfms_bp.route('/upload-to-wfms', methods=['POST'])
 def upload_to_wfms():
-    if 'username' not in session:
+    if not is_authenticated():
         return jsonify({'success': False, 'message': 'Unauthorized access. Please log in.'})
 
     report_id = request.form.get('reportId')

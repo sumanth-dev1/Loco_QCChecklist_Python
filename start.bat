@@ -12,8 +12,8 @@ curl.exe -s -m 2 http://localhost:5000/health >nul 2>&1
 if %ERRORLEVEL% equ 0 (
     echo.
     echo Loco QC server is ALREADY running on http://localhost:5000/
-    echo Opening application in your browser...
-    start http://localhost:5000/
+    echo Opening login page in your browser...
+    start http://localhost:5000/login.html
     ping 127.0.0.1 -n 3 >nul
     exit /b 0
 )
@@ -84,8 +84,8 @@ curl.exe -s -m 2 http://localhost:5000/health >nul 2>&1
 if !ERRORLEVEL! equ 0 (
     echo.
     echo Server is ready! Connected in !attempts! seconds.
-    echo Opening application at: http://localhost:5000/
-    start http://localhost:5000/
+    echo Opening login page at: http://localhost:5000/login.html
+    start http://localhost:5000/login.html
     ping 127.0.0.1 -n 3 >nul
     exit /b 0
 )
@@ -99,5 +99,5 @@ echo.
 echo [WARNING] Server took longer than 15 seconds to respond.
 echo Please check the "Loco QC Waitress Server" window for details (e.g. MySQL connection).
 echo Opening browser anyway...
-start http://localhost:5000/
+start http://localhost:5000/login.html
 pause

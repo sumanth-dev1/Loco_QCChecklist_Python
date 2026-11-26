@@ -40,9 +40,9 @@ if !ERRORLEVEL! equ 0 (
     echo.
     echo ========================================================
     echo Server is ready! (Connected in !attempts! seconds)
-    echo Opening application at: http://localhost:5000/
+    echo Opening login page at: http://localhost:5000/login.html
     echo ========================================================
-    start http://localhost:5000/
+    start http://localhost:5000/login.html
     exit /b 0
 )
 

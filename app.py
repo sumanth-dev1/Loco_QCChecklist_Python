@@ -1,7 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, redirect, session
 from mysql.connector import Error as MySQLError
 
 import config
@@ -16,10 +16,12 @@ logging.basicConfig(
 
 app = Flask(__name__, static_folder='static')
 app.secret_key = config.SECRET_KEY
+# Isolate Loco QC session cookie from other apps on localhost (e.g. Station QC on port 5001)
+app.config["SESSION_COOKIE_NAME"] = "loco_qc_session"
 
 # Register all 1-to-1 endpoint blueprints
 from routes.connect import connect_bp
-from routes.login import login_bp
+from routes.login import login_bp, is_authenticated
 from routes.create_user import create_user_bp
 from routes.edit_user import edit_user_bp
 from routes.view_users import view_users_bp
@@ -179,8 +181,19 @@ def serve_uploads(filename):
     return jsonify({"error": "File not found"}), 404
 
 
+PROTECTED_HTML_FILES = {
+    "index.html",
+    "create.html",
+    "create_hhp.html",
+    "observations.html",
+    "observations_hhp.html",
+}
+
+
 @app.route("/")
 def serve_root():
+    if not is_authenticated():
+        return redirect("/login.html")
     return send_from_directory(os.path.abspath("static"), "index.html")
 
 
@@ -188,6 +201,15 @@ def serve_root():
 def serve_static(path):
     if not path or path.endswith("/"):
         path += "index.html"
+
+    normalized_path = os.path.normpath(path).replace("\\", "/").lstrip("/").lower()
+
+    # Opening login.html always requires a fresh sign-in
+    if normalized_path == "login.html":
+        session.clear()
+
+    if normalized_path in PROTECTED_HTML_FILES and not is_authenticated():
+        return redirect("/login.html")
 
     # Check uploads
     if path.startswith("uploads/"):
@@ -205,10 +227,10 @@ def serve_static(path):
 @app.after_request
 def add_cache_control_headers(response):
     """
-    Prevent browsers from serving stale cached JavaScript and CSS
-    when code updates are deployed.
+    Prevent browsers from serving stale cached responses and disable
+    Back-Forward cache on HTML pages after logout.
     """
-    if "Cache-Control" not in response.headers:
+    if "Cache-Control" not in response.headers or response.mimetype == "text/html":
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"

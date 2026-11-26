@@ -7296,7 +7296,16 @@ else if (section === "16.0") {
 
 // Function to handle the logout
 function logout() {
-  window.location.href = "login.html"; // Replace with your actual login page URL
+  if (window.AuthGuard) {
+    window.AuthGuard.performLogout(false);
+  } else {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("employee_name");
+    localStorage.removeItem("role");
+    sessionStorage.clear();
+    window.location.href = "logout";
+  }
 }
 
 // Event listener for dynamic shed name update
