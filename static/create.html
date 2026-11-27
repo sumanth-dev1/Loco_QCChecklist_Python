@@ -6,7 +6,7 @@
   <title>Dynamic QA Form</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <script src="auth_guard.js?v=1.0" data-require-auth="true"></script>
-  <script src = "script.js?v=5.2" defer></script>
+  <script src = "script.js?v=5.3" defer></script>
    <!-- 3rd‑party libraries (all local) -->
   <script src="libs/jquery-3.6.0.min.js"></script>
   <script src="libs/zxing-browser.min.js"></script>
@@ -95,7 +95,7 @@
 
       if (locoId) {
         // Edit mode: fetch details and populate
-        fetch(`getReportById?loco_id=${encodeURIComponent(locoId)}`)
+        fetch(`getReportById?loco_id=${encodeURIComponent(locoId)}`, { cache: "no-store" })
           .then(response => response.json())
           .then(res => {
             if (res.success && res.data && res.data.locoDetails) {
@@ -105,8 +105,13 @@
               
               showSection("0.0").then(() => {
                 document.getElementById("loco-id").value = details.locoID || "";
-                document.getElementById("loco-type").value = details.locoType || "";
-                document.getElementById("brake-type").value = details.brakeType || "";
+                if (typeof window.setSelectValueNormalized === 'function') {
+                  window.setSelectValueNormalized(document.getElementById("loco-type"), details.locoType || "");
+                  window.setSelectValueNormalized(document.getElementById("brake-type"), details.brakeType || "");
+                } else {
+                  document.getElementById("loco-type").value = details.locoType || "";
+                  document.getElementById("brake-type").value = details.brakeType || "";
+                }
                 document.getElementById("railway-division").value = (details.railwayDivision || "").trim();
                 
                 const stdShedName = getStandardShedName(details.shedName || "");
@@ -130,7 +135,7 @@
           });
       } else {
         // Create/Back Navigation Mode: Check if we have active unsaved details to restore
-        const storedLocoInfo = sessionStorage.getItem("locoInfo") || localStorage.getItem("locoDetails");
+        const storedLocoInfo = sessionStorage.getItem("locoInfo") || sessionStorage.getItem("locoDetails") || localStorage.getItem("locoDetails");
         
         if (storedLocoInfo) {
           const details = JSON.parse(storedLocoInfo);
@@ -148,8 +153,13 @@
 
           showSection(sectionId).then(() => {
             if (document.getElementById("loco-id")) document.getElementById("loco-id").value = normalized.locoID;
-            if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
-            if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
+            if (typeof window.setSelectValueNormalized === 'function') {
+              window.setSelectValueNormalized(document.getElementById("loco-type"), normalized.locoType);
+              window.setSelectValueNormalized(document.getElementById("brake-type"), normalized.brakeType);
+            } else {
+              if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
+              if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
+            }
             if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (normalized.railwayDivision || "").trim();
             
             const stdShedName = getStandardShedName(normalized.shedName);
@@ -233,73 +243,15 @@ window.addEventListener("beforeunload", beforeUnloadHandler);
 
   </script>
   
-  <!-- Additional scripts (for loco info handling, etc.) -->
+  <!-- Clear stale edit-mode localStorage when opening create.html without loco_id -->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const urlParams = new URLSearchParams(window.location.search);
       const locoId = urlParams.get("loco_id");
       if (locoId) {
         localStorage.setItem("selectedLocoId", locoId);
-        // Set current date if necessary.
-        const dateElem = document.getElementById("date");
-        if (dateElem) {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          dateElem.value = `${year}-${month}-${day}`;
-        }
-        fetch(`getReportById?loco_id=${locoId}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              const locoInfo = data.data.locoDetails;
-              if (locoInfo) {
-                localStorage.setItem("locoDetails", JSON.stringify(locoInfo));
-                const locoIdElem = document.getElementById("loco-id");
-                if (locoIdElem) locoIdElem.value = locoInfo.locoID || "";
-                const locoTypeElem = document.getElementById("loco-type");
-                if (locoTypeElem) locoTypeElem.value = locoInfo.locoType || "";
-                const brakeTypeElem = document.getElementById("brake-type");
-                if (brakeTypeElem) brakeTypeElem.value = locoInfo.brakeType || "";
-                const divisionElem = document.getElementById("railway-division");
-                if (divisionElem) divisionElem.value = (locoInfo.railwayDivision || "").trim();
-                const stdShed = getStandardShedName(locoInfo.shedName || "");
-                if (typeof window.updateShedNames === 'function') {
-                  window.updateShedNames(stdShed);
-                }
-                const shedElem = document.getElementById("shed-name");
-                if (shedElem) shedElem.value = stdShed;
-              }
-            } else {
-              console.error("Error fetching report details:", data.message);
-            }
-          })
-          .catch(error => console.error("Fetch error:", error));
       } else {
         localStorage.removeItem("locoDetails");
-        const stored = localStorage.getItem("locoDetails");
-        if (stored) {
-          const locoInfo = JSON.parse(stored);
-          const locoIdElem = document.getElementById("loco-id");
-          if (locoIdElem) locoIdElem.value = locoInfo.locoID || "";
-          const locoTypeElem = document.getElementById("loco-type");
-          if (locoTypeElem) locoTypeElem.value = locoInfo.locoType || "";
-          const brakeTypeElem = document.getElementById("brake-type");
-          if (brakeTypeElem) brakeTypeElem.value = locoInfo.brakeType || "";
-          const divisionElem = document.getElementById("railway-division");
-          if (divisionElem) divisionElem.value = locoInfo.railwayDivision || "";
-          const shedElem = document.getElementById("shed-name");
-          if (shedElem) shedElem.value = locoInfo.shedName || "";
-          const dateElem = document.getElementById("date");
-          if (dateElem && locoInfo.inspectionDate) {
-            const d = new Date(locoInfo.inspectionDate);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            dateElem.value = `${year}-${month}-${day}`;
-          }
-        }
       }
     });
   </script>

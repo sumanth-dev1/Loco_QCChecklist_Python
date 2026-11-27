@@ -4,6 +4,7 @@ import json, re
 from flask import Blueprint, request, jsonify
 from db import get_connection
 from routes.upload import sanitize_and_save_image_path
+from section_map import sync_loco_metadata
 
 updateObservations_bp = Blueprint('updateObservations', __name__)
 
@@ -77,6 +78,19 @@ def updateObservations():
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True, buffered=True)
+
+        loco_type, brake_type, railway_division, shed_name, inspection_date = sync_loco_metadata(
+            cursor,
+            loco_id,
+            loco_type,
+            brake_type,
+            railway_division,
+            shed_name,
+            inspection_date,
+            table_names=TABLE_NAMES,
+            exclude_table=table_name,
+            update_inspection_date=False,
+        )
 
         for obs in observations:
             s_no = obs.get('S_no')
@@ -166,8 +180,8 @@ def updateObservations():
                 else:
                     update_sql = f"""UPDATE {table_name}
                         SET loco_type = %s, brake_type = %s, railway_division = %s, shed_name = %s, inspection_date = %s, observation_text = %s, observation_status = %s, remarks = %s, updated_at = NOW()
-                        WHERE loco_id = %s AND section_id = %s AND s_no = %s"""
-                    cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, status, remarks, loco_id, section_id, s_no))
+                        WHERE loco_id = %s AND (section_id = %s OR section_id = REPLACE(%s, '_', '.') OR section_id = REPLACE(%s, '.', '_')) AND s_no = %s"""
+                    cursor.execute(update_sql, (loco_type, brake_type, railway_division, shed_name, inspection_date, observation_text, status, remarks, loco_id, section_id, section_id, section_id, s_no))
 
                 debug_entry['action'] = 'updated'
 

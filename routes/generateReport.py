@@ -27,9 +27,9 @@ def generateReport():
     if not loco_id_raw:
         return jsonify({'success': False, 'message': 'Missing loco-id in POST data'}), 200
 
-    loco_id = html.escape(loco_id_raw)
-    railway_division = html.escape(railway_division_raw)
-    shed_name = html.escape(shed_name_raw)
+    loco_id = html.escape(str(loco_id_raw).strip())
+    railway_division = html.escape(str(railway_division_raw).strip())
+    shed_name = html.escape(str(shed_name_raw).strip())
 
     conn = None
     try:

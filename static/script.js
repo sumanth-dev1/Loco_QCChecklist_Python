@@ -71,6 +71,42 @@ document.addEventListener("DOMContentLoaded", function () {
   // Instead, rely on showSection to do it conditionally.
 });
 
+function setSelectValueNormalized(selectElem, rawValue) {
+  if (!selectElem) return false;
+  const target = String(rawValue || "").trim();
+  if (!target) {
+    selectElem.value = "";
+    return false;
+  }
+  const targetLower = target.toLowerCase();
+  const match = Array.from(selectElem.options).find(
+    opt =>
+      opt.value.trim().toLowerCase() === targetLower ||
+      opt.textContent.trim().toLowerCase() === targetLower
+  );
+  if (match) {
+    Array.from(selectElem.options).forEach(opt => {
+      const isMatch = opt === match;
+      opt.selected = isMatch;
+      if (isMatch) {
+        opt.setAttribute("selected", "selected");
+      } else {
+        opt.removeAttribute("selected");
+      }
+    });
+    selectElem.value = match.value;
+    return true;
+  }
+  const fallbackOpt = document.createElement("option");
+  fallbackOpt.value = target;
+  fallbackOpt.textContent = target;
+  fallbackOpt.selected = true;
+  fallbackOpt.setAttribute("selected", "selected");
+  selectElem.appendChild(fallbackOpt);
+  selectElem.value = target;
+  return true;
+}
+
 // In showSection, decide if it's okay to switch sections, and if so, highlight the new button.
 async function showSection(section) {
   // 1) If user tries to navigate away with unsaved changes, confirm
@@ -140,38 +176,37 @@ async function showSection(section) {
   //const locoInfo = JSON.parse(localStorage.getItem("locoDetails") || "{}");
 
   // console.log("locoInfo is:", locoInfo);
-  // First, try to get loco info from sessionStorage (for a fresh page)
-  const storedLocal = localStorage.getItem("locoDetails");
-  const storedSession = sessionStorage.getItem("locoInfo");
-
-  let locoInfo = {};
-  if (storedLocal) {
-    // If localStorage has data, use it (edit mode)
-    locoInfo = JSON.parse(storedLocal);
-  } else if (storedSession) {
-    // Otherwise, if sessionStorage is present, use that (fresh page)
-    locoInfo = JSON.parse(storedSession);
-  } else {
-    // Otherwise, nothing is set → use empty defaults
-    locoInfo = {
-      locoID: "",
-      locoType: "",
-      brakeType: "",
-      railwayDivision: "",
-      shedName: "",
-      inspectionDate: ""
-    };
-  }
-
-  // Preserve current on-screen division/shed if already selected when switching sections
+  const liveLocoId = document.getElementById("loco-id")?.value;
+  const liveLocoType = document.getElementById("loco-type")?.value;
+  const liveBrakeType = document.getElementById("brake-type")?.value;
   const liveDivision = document.getElementById("railway-division")?.value;
   const liveShed = document.getElementById("shed-name")?.value;
-  if (liveDivision) {
-    locoInfo.railwayDivision = liveDivision;
-    locoInfo.shedName = liveShed || "";
-  } else if (liveShed && !locoInfo.shedName) {
-    locoInfo.shedName = liveShed;
+  const liveDate = document.getElementById("date")?.value;
+
+  const storedLocal = localStorage.getItem("locoDetails");
+  const storedSession = sessionStorage.getItem("locoInfo");
+  const storedSessionDetails = sessionStorage.getItem("locoDetails");
+
+  let parsedStored = {};
+  for (const raw of [storedLocal, storedSession, storedSessionDetails]) {
+    if (!raw) continue;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        parsedStored = parsed;
+        break;
+      }
+    } catch (e) {}
   }
+
+  let locoInfo = {
+    locoID: liveLocoId || parsedStored.locoID || parsedStored.locoId || parsedStored.loco_id || "",
+    locoType: liveLocoType || parsedStored.locoType || parsedStored.loco_type || "",
+    brakeType: liveBrakeType || parsedStored.brakeType || parsedStored.brake_type || "",
+    railwayDivision: liveDivision || parsedStored.railwayDivision || parsedStored.railway_division || "",
+    shedName: liveDivision ? (liveShed || "") : (liveShed || parsedStored.shedName || parsedStored.shed_name || ""),
+    inspectionDate: liveDate || parsedStored.inspectionDate || parsedStored.inspection_date || parsedStored.inspection_Date || ""
+  };
 
 
 
@@ -8163,7 +8198,15 @@ Is other end of the Chain/Sling securely fastened to RFID reader by using bolt p
     ;`
   }
 
-  // Synchronize division & shed dropdowns AFTER all mainContent.innerHTML += appends complete
+  // Synchronize loco type, brake type, division & shed dropdowns AFTER all mainContent.innerHTML += appends complete
+  const renderedLocoTypeSelect = document.getElementById("loco-type");
+  if (renderedLocoTypeSelect && locoInfo && locoInfo.locoType) {
+    setSelectValueNormalized(renderedLocoTypeSelect, locoInfo.locoType);
+  }
+  const renderedBrakeTypeSelect = document.getElementById("brake-type");
+  if (renderedBrakeTypeSelect && locoInfo && locoInfo.brakeType) {
+    setSelectValueNormalized(renderedBrakeTypeSelect, locoInfo.brakeType);
+  }
   const renderedDivisionSelect = document.getElementById("railway-division");
   if (renderedDivisionSelect && locoInfo && locoInfo.railwayDivision) {
     const targetDiv = String(locoInfo.railwayDivision).trim();
@@ -8317,13 +8360,52 @@ async function generateReport() {
   // Remove the beforeunload listener so that it won't trigger when clicking the button.
   window.removeEventListener("beforeunload", beforeUnloadHandler);
 
-  const locoId = document.getElementById("loco-id").value;
-  const railwayDivision = document.getElementById("railway-division").value;
-  const shedName = document.getElementById("shed-name").value;
+  const locoId = document.getElementById("loco-id").value.trim();
+  const railwayDivision = document.getElementById("railway-division").value.trim();
+  const shedName = document.getElementById("shed-name").value.trim();
+  const locoType = (document.getElementById("loco-type")?.value || "").trim();
+  const brakeType = (document.getElementById("brake-type")?.value || "").trim();
+  const inspectionDate = (document.getElementById("date")?.value || "").trim();
 
   if (!locoId || !railwayDivision || !shedName) {
     alert("Please fill all the fields.");
     return;
+  }
+
+  if (locoType && brakeType) {
+    const syncDate = inspectionDate || new Date().toISOString().split("T")[0];
+    const syncedInfo = {
+      locoID: locoId,
+      locoType: locoType,
+      brakeType: brakeType,
+      railwayDivision: railwayDivision,
+      shedName: shedName,
+      inspectionDate: syncDate,
+    };
+    sessionStorage.setItem("locoInfo", JSON.stringify(syncedInfo));
+    if (localStorage.getItem("locoDetails")) {
+      localStorage.setItem("locoDetails", JSON.stringify(syncedInfo));
+    }
+    try {
+      await fetch("connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          "loco-id": locoId,
+          "loco-type": locoType,
+          "brake-type": brakeType,
+          "railway-division": railwayDivision,
+          "shed-name": shedName,
+          "inspection-date": syncDate,
+          "preserve-date": "1",
+          "update-only": "1",
+        }),
+      });
+    } catch (syncErr) {
+      console.warn("Could not sync loco header before report:", syncErr);
+    }
   }
 
   const response = await fetch("generateReport", {
@@ -8529,8 +8611,25 @@ async function saveLocoInfo(section) {
     inspectionDate: inspectionDate,
   };
 
-  // Save to sessionStorage
+  // Save to sessionStorage (and keep edit-mode localStorage in sync if active)
   sessionStorage.setItem("locoInfo", JSON.stringify(locoData));
+  if (localStorage.getItem("locoDetails")) {
+    localStorage.setItem("locoDetails", JSON.stringify(locoData));
+  }
+  if (sessionStorage.getItem("locoDetails")) {
+    try {
+      const existingDetails = JSON.parse(sessionStorage.getItem("locoDetails"));
+      if (existingDetails && typeof existingDetails === "object") {
+        existingDetails.loco_id = locoID;
+        existingDetails.loco_type = locoType;
+        existingDetails.brake_type = brakeType;
+        existingDetails.railway_division = railwayDivision;
+        existingDetails.shed_name = shedName;
+        existingDetails.inspection_date = inspectionDate;
+        sessionStorage.setItem("locoDetails", JSON.stringify(existingDetails));
+      }
+    } catch (e) {}
+  }
 
   try {
     const response = await fetch("connect", {
@@ -8790,6 +8889,41 @@ async function saveObservation(section) {
     const data = await response.json();
 
     if (data.success) {
+      const currentLocoType = document.getElementById("loco-type")?.value || "";
+      const currentBrakeType = document.getElementById("brake-type")?.value || "";
+      const currentDate = document.getElementById("date")?.value || "";
+      const syncedInfo = {
+        locoID: locoId,
+        locoType: currentLocoType,
+        brakeType: currentBrakeType,
+        railwayDivision: railwayDivision,
+        shedName: shedName,
+        inspectionDate: currentDate,
+      };
+      sessionStorage.setItem("locoInfo", JSON.stringify(syncedInfo));
+      if (localStorage.getItem("locoDetails")) {
+        localStorage.setItem("locoDetails", JSON.stringify(syncedInfo));
+      }
+      if (locoId && currentLocoType && currentBrakeType && railwayDivision && shedName && currentDate) {
+        try {
+          await fetch("connect", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              "loco-id": locoId,
+              "loco-type": currentLocoType,
+              "brake-type": currentBrakeType,
+              "railway-division": railwayDivision,
+              "shed-name": shedName,
+              "inspection-date": currentDate,
+              "preserve-date": "1",
+            }),
+          });
+        } catch (syncErr) {
+          console.warn("Could not sync loco header info:", syncErr);
+        }
+      }
+
       document.getElementById("messageBox").innerText = "🎉 Observations saved successfully!";
       setTimeout(() => {
         document.getElementById("messageBox").innerText = "";
@@ -8831,18 +8965,33 @@ function getSectionIDWithSno(observations) {
 
 // Function to populate loco details
 function populateLocoDetails(locoDetails) {
+  if (!locoDetails || typeof locoDetails !== "object") return;
 
-
-  // Check if session storage already contains loco details
+  // Keep sessionStorage & localStorage synchronized with fresh DB values
   sessionStorage.setItem("locoDetails", JSON.stringify(locoDetails));
+
+  const normalizedInfo = {
+    locoID: String(locoDetails.loco_id || locoDetails.locoID || ""),
+    locoType: String(locoDetails.loco_type || locoDetails.locoType || "").trim(),
+    brakeType: String(locoDetails.brake_type || locoDetails.brakeType || "").trim(),
+    railwayDivision: String(locoDetails.railway_division || locoDetails.railwayDivision || "").trim(),
+    shedName: String(locoDetails.shed_name || locoDetails.shedName || "").trim(),
+    inspectionDate: String(locoDetails.inspection_date || locoDetails.inspectionDate || "").trim(),
+  };
+  sessionStorage.setItem("locoInfo", JSON.stringify(normalizedInfo));
+
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("loco_id") || localStorage.getItem("locoDetails")) {
+    localStorage.setItem("locoDetails", JSON.stringify(normalizedInfo));
+  }
 
   // Populate the form fields with the loco details
   const locoTypeInput = document.getElementById("loco-type");
   const brakeTypeInput = document.getElementById("brake-type");
   const inspectionDateInput = document.getElementById("date");
 
-  if (locoTypeInput) locoTypeInput.value = locoDetails.loco_type || "";
-  if (brakeTypeInput) brakeTypeInput.value = locoDetails.brake_type || "";
+  if (locoTypeInput) setSelectValueNormalized(locoTypeInput, normalizedInfo.locoType);
+  if (brakeTypeInput) setSelectValueNormalized(brakeTypeInput, normalizedInfo.brakeType);
 
   // Always use current date when editing
   if (inspectionDateInput) {
@@ -9442,8 +9591,10 @@ function getDetails() {
       await checkAndHighlightSections(locoID, shedName, railwayDivision);
 
       // Hide Save button and show Update button when Get Details is clicked
-      document.getElementById('save-btn').style.display = 'none';
-      document.getElementById('update-btn').style.display = 'inline-block'; // Show Update button
+      const saveBtnEl = document.getElementById('save-btn');
+      const updateBtnEl = document.getElementById('update-btn');
+      if (saveBtnEl) saveBtnEl.style.display = 'none';
+      if (updateBtnEl) updateBtnEl.style.display = 'inline-block'; // Show Update button
     },
     error: function (xhr, status, error) {
       console.error("❌ Error fetching data from server:", status, error);

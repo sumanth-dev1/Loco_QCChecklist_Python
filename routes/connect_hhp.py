@@ -17,6 +17,8 @@ def connect_hhp():
     railway_division = (request.form.get('railway-division') or '').strip()
     shed_name = (request.form.get('shed-name') or '').strip()
     inspection_date = (request.form.get('inspection-date') or '').strip()
+    preserve_date = (request.form.get('preserve-date') or '').strip() == '1'
+    update_only = (request.form.get('update-only') or '').strip() == '1'
 
     if not loco_id or not loco_type or not brake_type or not railway_division or not shed_name or not inspection_date:
         return jsonify({'success': False, 'message': '❌ All fields are required'})
@@ -26,13 +28,26 @@ def connect_hhp():
     conn = None
     try:
         conn = get_hhp_connection()
-        cursor = conn.cursor(buffered=True)
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
         cursor.execute("SELECT 1 FROM loco WHERE Loco_Id = %s", (loco_id,))
         row = cursor.fetchone()
 
         if row:
-            return jsonify({'success': True, 'message': 'ℹ️ HHP Loco already exists. Start time preserved.'})
+            from section_map import sync_loco_metadata
+            sync_loco_metadata(
+                cursor,
+                loco_id,
+                loco_type,
+                brake_type,
+                railway_division,
+                shed_name,
+                inspection_date,
+                update_inspection_date=(not preserve_date),
+            )
+            return jsonify({'success': True, 'message': 'ℹ️ HHP Loco already exists. Details updated and start time preserved.'})
+        elif update_only:
+            return jsonify({'success': False, 'message': 'HHP Loco not found.'})
         else:
             cursor.execute(
                 """INSERT INTO loco 

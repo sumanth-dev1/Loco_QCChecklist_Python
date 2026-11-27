@@ -6,7 +6,7 @@
   <title>Dynamic QA Form - HHP LOCO</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <script src="auth_guard.js?v=1.0" data-require-auth="true"></script>
-  <script src="script_hhp.js?v=3.2" defer></script>
+  <script src="script_hhp.js?v=3.3" defer></script>
   <!-- 3rd‑party libraries (all local) -->
   <script src="libs/jquery-3.6.0.min.js"></script>
   <script src="libs/zxing-browser.min.js"></script>
@@ -97,12 +97,22 @@
       return trimmedShed;
     }
 
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const locoId = urlParams.get("loco_id");
+      if (locoId) {
+        localStorage.setItem("hhp_selectedLocoId", locoId);
+      } else {
+        localStorage.removeItem("hhp_locoDetails");
+      }
+    });
+
     window.addEventListener('load', function() {
       const urlParams = new URLSearchParams(window.location.search);
       const locoId = urlParams.get("loco_id");
 
       if (locoId) {
-        fetch(`getHhpReportById?loco_id=${encodeURIComponent(locoId)}`)
+        fetch(`getHhpReportById?loco_id=${encodeURIComponent(locoId)}`, { cache: "no-store" })
           .then(response => response.json())
           .then(res => {
             if (res.success && res.data && res.data.locoDetails) {
@@ -112,8 +122,13 @@
               
               showSection("0.0").then(() => {
                 if (document.getElementById("loco-id")) document.getElementById("loco-id").value = details.locoID || "";
-                if (document.getElementById("loco-type")) document.getElementById("loco-type").value = details.locoType || "";
-                if (document.getElementById("brake-type")) document.getElementById("brake-type").value = details.brakeType || "";
+                if (typeof window.setSelectValueNormalized === 'function') {
+                  window.setSelectValueNormalized(document.getElementById("loco-type"), details.locoType || "");
+                  window.setSelectValueNormalized(document.getElementById("brake-type"), details.brakeType || "");
+                } else {
+                  if (document.getElementById("loco-type")) document.getElementById("loco-type").value = details.locoType || "";
+                  if (document.getElementById("brake-type")) document.getElementById("brake-type").value = details.brakeType || "";
+                }
                 if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (details.railwayDivision || "").trim();
                 const stdShedName = getStandardShedName(details.shedName || "");
                 if (typeof window.updateShedNames === 'function') window.updateShedNames(stdShedName);
@@ -132,7 +147,7 @@
             showSection("0.0");
           });
       } else {
-        const storedLocoInfo = sessionStorage.getItem("hhp_locoInfo") || localStorage.getItem("hhp_locoDetails");
+        const storedLocoInfo = sessionStorage.getItem("hhp_locoInfo") || sessionStorage.getItem("hhp_locoDetails") || localStorage.getItem("hhp_locoDetails");
         
         if (storedLocoInfo) {
           const details = JSON.parse(storedLocoInfo);
@@ -150,8 +165,13 @@
 
           showSection(sectionId).then(() => {
             if (document.getElementById("loco-id")) document.getElementById("loco-id").value = normalized.locoID;
-            if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
-            if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
+            if (typeof window.setSelectValueNormalized === 'function') {
+              window.setSelectValueNormalized(document.getElementById("loco-type"), normalized.locoType);
+              window.setSelectValueNormalized(document.getElementById("brake-type"), normalized.brakeType);
+            } else {
+              if (document.getElementById("loco-type")) document.getElementById("loco-type").value = normalized.locoType;
+              if (document.getElementById("brake-type")) document.getElementById("brake-type").value = normalized.brakeType;
+            }
             if (document.getElementById("railway-division")) document.getElementById("railway-division").value = (normalized.railwayDivision || "").trim();
             const stdShedName = getStandardShedName(normalized.shedName);
             if (typeof window.updateShedNames === 'function') window.updateShedNames(stdShedName);
